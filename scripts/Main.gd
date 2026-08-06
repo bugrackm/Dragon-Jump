@@ -42,7 +42,11 @@ func _physics_process(_delta: float) -> void:
 	platform_manager.update_for_camera(camera.position.y)
 
 	var camera_bottom := camera.position.y + get_viewport_rect().size.y * 0.5
-	if player.global_position.y > camera_bottom:
+	# Tighter death line: 35% of screen below camera center.
+	# This prevents the player from getting stuck on a low platform after
+	# falling through a breakable/disappearing platform.
+	var death_line := camera_bottom + get_viewport_rect().size.y * 0.35
+	if player.global_position.y > death_line:
 		run_session.end_run()
 
 

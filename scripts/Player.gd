@@ -33,12 +33,13 @@ func _physics_process(delta: float) -> void:
 	var horizontal_input := clampf(keyboard_direction + _touch_direction, -1.0, 1.0)
 	velocity.x = horizontal_input * MOVE_SPEED
 	velocity.y += GRAVITY * delta
+	var was_descending := velocity.y >= 0.0
 
 	move_and_slide()
 
 	# One-way platform contacts become floors only while the player is descending.
-	if is_on_floor():
-		velocity.y = JUMP_VELOCITY
+	if was_descending and is_on_floor():
+		_apply_platform_landing()
 
 	_wrap_around_screen()
 
@@ -76,9 +77,23 @@ func get_jump_height() -> float:
 	return (JUMP_VELOCITY * JUMP_VELOCITY) / (2.0 * GRAVITY)
 
 
+func _apply_platform_landing() -> void:
+	for collision_index in get_slide_collision_count():
+		var collision := get_slide_collision(collision_index)
+		if collision.get_normal().y < -0.5:
+			var platform := collision.get_collider()
+			if platform and platform.has_method("on_player_landed"):
+				platform.call("on_player_landed", self)
+			break
+
+	# Spring platforms set a negative velocity above. Every other landing keeps
+	# the original M1 automatic jump unchanged.
+	if velocity.y >= 0.0:
+		velocity.y = JUMP_VELOCITY
+
+
 func _wrap_around_screen() -> void:
 	if global_position.x < 0.0:
 		global_position.x = _screen_width
 	elif global_position.x > _screen_width:
 		global_position.x = 0.0
-

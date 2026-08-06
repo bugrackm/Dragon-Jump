@@ -1,0 +1,39 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/platforms/BreakablePlatform.gd" id="1_breakable"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(240, 36)
+
+[node name="BreakablePlatform" type="StaticBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_breakable")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="Surface" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, 18, -120, 18)
+color = Color(0.8, 0.25, 0.2, 1)
+
+[node name="TopHighlight" type="Polygon2D" parent="Visual"]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, -8, -120, -8)
+color = Color(0.96, 0.45, 0.35, 1)
+
+[node name="CrackLeft" type="Line2D" parent="Visual"]
+points = PackedVector2Array(-52, -16, -42, -3, -50, 8, -38, 17)
+width = 5.0
+default_color = Color(0.35, 0.08, 0.07, 1)
+
+[node name="CrackRight" type="Line2D" parent="Visual"]
+points = PackedVector2Array(44, -16, 34, -4, 43, 5, 32, 17)
+width = 5.0
+default_color = Color(0.35, 0.08, 0.07, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+one_way_collision_margin = 12.0
+
+[node name="BreakTimer" type="Timer" parent="."]
+one_shot = true
