@@ -1,0 +1,12 @@
+Öncelikle 2. oyunumu geliştirmeye başlamak için senden bir araştırma yapmanı istiyeceğim;
+
+Oyunumuz doodle jump benzeri bir oyun olucak. Ana karakterimizde oyunun adından da anlaşılacağı üzere bir adet ejderha olacak. Mobil bir app şeklinde geliştireceğiz play store'de yayınlamak üzere.
+
+Şimdi öncelikle sen sub agentlar aracılığı ile bir araştırma yapıcaksın;
+
+1. Oyun için hangi oyun motorunu kullanmalıyız; unity, godot etc. 
+2. Bu motora göre hangi dili kullanacağız; C, C#, etc.
+3. Oyun karakterini nasıl modelliyeceğimizi, oyun mekaniklerini, doodle jump'ın bağımlılık yapan formülü gibi şeyleri detaylı bir şekilde araştıracaksın.
+4. Agentlar sana önemli kısımları context olarak vericek, araştırmamız tamamlandığında kod yazmaya başlıyacaksın codex 5.6 sol high ile.
+5.
+ Bana sorular sorucaksın oyunun nasıl olmasını istediğim hakkında. Yeterli bilgiye ulaştığında oyunu geliştirmeye başlıyacaksın.
