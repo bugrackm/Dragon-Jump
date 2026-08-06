@@ -1,6 +1,10 @@
 # Prompts
 Prompts.txt
 
+# AI context documents (local only, not for GitHub)
+docs/ai/
+docs/codex-briefs/
+
 # Hermes operations (logs, reports — not durable docs)
 .hermes-ops/
 
