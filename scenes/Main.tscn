@@ -1,0 +1,33 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/RunSession.gd" id="2_session"]
+[ext_resource type="Script" path="res://scripts/ProfileStore.gd" id="3_profile"]
+[ext_resource type="Script" path="res://scripts/PlatformManager.gd" id="4_manager"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="5_player"]
+[ext_resource type="PackedScene" path="res://scenes/Platform.tscn" id="6_platform"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="7_hud"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="RunSession" type="Node" parent="."]
+script = ExtResource("2_session")
+
+[node name="ProfileStore" type="Node" parent="."]
+script = ExtResource("3_profile")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="PlatformManager" type="Node2D" parent="World"]
+script = ExtResource("4_manager")
+platform_scene = ExtResource("6_platform")
+
+[node name="Player" parent="World" instance=ExtResource("5_player")]
+position = Vector2(540, 1678)
+
+[node name="Camera2D" type="Camera2D" parent="World"]
+position = Vector2(540, 960)
+position_smoothing_enabled = false
+
+[node name="HUD" parent="." instance=ExtResource("7_hud")]

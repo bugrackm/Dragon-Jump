@@ -1,2 +1,29 @@
+# Prompts
 Prompts.txt
-docs
+
+# Hermes operations (logs, reports — not durable docs)
+.hermes-ops/
+
+# Environment
+.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.godot/editor/
+.godot/import/
+
+# Android build
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# Python
+__pycache__/
+*.pyc
+# Godot editor cache
+.godot/
