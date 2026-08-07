@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/RunSession.gd" id="2_session"]
@@ -11,6 +11,9 @@
 [ext_resource type="PackedScene" path="res://scenes/platforms/BreakablePlatform.tscn" id="9_breakable"]
 [ext_resource type="PackedScene" path="res://scenes/platforms/DisappearingPlatform.tscn" id="10_disappearing"]
 [ext_resource type="PackedScene" path="res://scenes/platforms/SpringPlatform.tscn" id="11_spring"]
+[ext_resource type="Script" path="res://scripts/enemies/EnemyManager.gd" id="12_enemy_manager"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/Wyvern.tscn" id="13_wyvern"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/StaticMonster.tscn" id="14_static_monster"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -30,6 +33,11 @@ moving_platform_scene = ExtResource("8_moving")
 breakable_platform_scene = ExtResource("9_breakable")
 disappearing_platform_scene = ExtResource("10_disappearing")
 spring_platform_scene = ExtResource("11_spring")
+
+[node name="EnemyManager" type="Node2D" parent="World"]
+script = ExtResource("12_enemy_manager")
+wyvern_scene = ExtResource("13_wyvern")
+static_monster_scene = ExtResource("14_static_monster")
 
 [node name="Player" parent="World" instance=ExtResource("5_player")]
 position = Vector2(540, 1678)

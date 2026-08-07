@@ -2,6 +2,8 @@ extends Node2D
 
 ## Deterministically builds a reachable chain of one-way platforms above the player.
 
+signal platform_spawned(platform: Node2D, spawn_index: int, platform_type: StringName, center: Vector2, travel_half_width: float)
+
 @export var platform_scene: PackedScene
 @export var moving_platform_scene: PackedScene
 @export var breakable_platform_scene: PackedScene
@@ -176,6 +178,7 @@ func _spawn_platform(
 	add_child(platform)
 	_platforms.append(platform)
 	_spawned_count += 1
+	emit_signal("platform_spawned", platform, _spawned_count, platform_type, spawn_position, moving_range * 0.5)
 
 
 func _get_platform_scene(platform_type: StringName) -> PackedScene:

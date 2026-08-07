@@ -7,6 +7,7 @@ extends Node2D
 @onready var run_session = $RunSession
 @onready var profile_store = $ProfileStore
 @onready var platform_manager = $World/PlatformManager
+@onready var enemy_manager = $World/EnemyManager
 @onready var player = $World/Player
 @onready var camera: Camera2D = $World/Camera2D
 @onready var hud = $HUD
@@ -21,6 +22,7 @@ func _ready() -> void:
 
 	_highest_camera_y = camera.position.y
 	run_session.start_new_run(run_seed, player.global_position.y)
+	enemy_manager.initialize(run_session, platform_manager, player)
 	platform_manager.initialize(
 		run_session.rng,
 		Vector2(540.0, 1740.0),
@@ -40,6 +42,7 @@ func _physics_process(_delta: float) -> void:
 	run_session.update_player_altitude(player.global_position.y)
 	_follow_player_upward()
 	platform_manager.update_for_camera(camera.position.y)
+	enemy_manager.update_for_camera(camera.position.y)
 
 	var camera_bottom := camera.position.y + get_viewport_rect().size.y * 0.5
 	# Tighter death line: 35% of screen below camera center.
@@ -63,7 +66,7 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_game_over(final_score: int) -> void:
 	player.stop_movement()
+	enemy_manager.set_active(false)
 	profile_store.update_high_score(final_score)
 	hud.set_high_score(profile_store.high_score)
 	hud.show_game_over(final_score)
-
