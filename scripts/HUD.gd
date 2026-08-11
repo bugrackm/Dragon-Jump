@@ -6,6 +6,7 @@ signal fire_requested
 
 @onready var score_label: Label = $MarginContainer/Rows/ScoreLabel
 @onready var high_score_label: Label = $MarginContainer/Rows/HighScoreLabel
+@onready var coin_label: Label = $MarginContainer/Rows/CoinLabel
 @onready var fire_button: Button = $FireButton
 
 var _fire_on_cooldown := false
@@ -22,6 +23,10 @@ func set_score(value: int) -> void:
 
 func set_high_score(value: int) -> void:
 	high_score_label.text = "High score: %d" % value
+
+
+func set_coins(value: int) -> void:
+	coin_label.text = "Coins: %d" % value
 
 
 func set_fire_cooldown(on_cooldown: bool) -> void:

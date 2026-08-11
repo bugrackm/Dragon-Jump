@@ -2,6 +2,8 @@ extends Node2D
 
 ## Deterministically coordinates platform-owned monsters and flying wyverns.
 
+signal enemy_destroyed(enemy_position: Vector2)
+
 const SCREEN_WIDTH := 1080.0
 const SCREEN_HEIGHT := 1920.0
 const BOTTOM_FREE_BUFFER := 300.0
@@ -96,9 +98,16 @@ func get_active_enemy_count() -> int:
 
 
 func destroy_enemy(enemy: Area2D) -> void:
-	if is_instance_valid(enemy):
-		_enemies.erase(enemy)
-		enemy.queue_free()
+	if (
+		not is_instance_valid(enemy)
+		or enemy.is_queued_for_deletion()
+		or not _enemies.has(enemy)
+	):
+		return
+
+	_enemies.erase(enemy)
+	enemy_destroyed.emit(enemy.global_position)
+	enemy.queue_free()
 
 
 func _on_platform_spawned(
@@ -169,6 +178,7 @@ func _try_spawn_static_monster(platform: Node2D, platform_type: StringName) -> v
 	monster.position = Vector2(0.0, STATIC_MONSTER_OFFSET_Y)
 	monster.set_meta("enemy_type", &"static_monster")
 	monster.body_entered.connect(_on_enemy_body_entered)
+	platform.set_meta("has_static_monster", true)
 	platform.add_child(monster)
 	_enemies.append(monster)
 

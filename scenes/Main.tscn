@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/RunSession.gd" id="2_session"]
@@ -14,6 +14,8 @@
 [ext_resource type="Script" path="res://scripts/enemies/EnemyManager.gd" id="12_enemy_manager"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/Wyvern.tscn" id="13_wyvern"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/StaticMonster.tscn" id="14_static_monster"]
+[ext_resource type="Script" path="res://scripts/CoinManager.gd" id="15_coin_manager"]
+[ext_resource type="PackedScene" path="res://scenes/Coin.tscn" id="16_coin"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -33,6 +35,10 @@ moving_platform_scene = ExtResource("8_moving")
 breakable_platform_scene = ExtResource("9_breakable")
 disappearing_platform_scene = ExtResource("10_disappearing")
 spring_platform_scene = ExtResource("11_spring")
+
+[node name="CoinManager" type="Node2D" parent="World"]
+script = ExtResource("15_coin_manager")
+coin_scene = ExtResource("16_coin")
 
 [node name="EnemyManager" type="Node2D" parent="World"]
 script = ExtResource("12_enemy_manager")

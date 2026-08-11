@@ -7,6 +7,7 @@ extends Node2D
 @onready var run_session = $RunSession
 @onready var profile_store = $ProfileStore
 @onready var platform_manager = $World/PlatformManager
+@onready var coin_manager = $World/CoinManager
 @onready var enemy_manager = $World/EnemyManager
 @onready var player = $World/Player
 @onready var world: Node2D = $World
@@ -20,12 +21,16 @@ func _ready() -> void:
 	run_session.score_changed.connect(_on_score_changed)
 	run_session.game_over.connect(_on_game_over)
 	profile_store.high_score_changed.connect(hud.set_high_score)
+	profile_store.coins_changed.connect(hud.set_coins)
+	coin_manager.coin_collected.connect(_on_coin_collected)
+	enemy_manager.enemy_destroyed.connect(coin_manager._on_enemy_destroyed)
 	hud.fire_requested.connect(player.request_fire)
 	player.ability_controller.cooldown_changed.connect(hud.set_fire_cooldown)
 
 	_highest_camera_y = camera.position.y
 	player.initialize_abilities(world, enemy_manager, camera)
 	run_session.start_new_run(run_seed, player.global_position.y)
+	coin_manager.initialize(player, camera, run_session.rng_seed, platform_manager)
 	enemy_manager.initialize(run_session, platform_manager, player)
 	platform_manager.initialize(
 		run_session.rng,
@@ -36,6 +41,7 @@ func _ready() -> void:
 	)
 	hud.set_score(0)
 	hud.set_high_score(profile_store.high_score)
+	hud.set_coins(profile_store.total_coins)
 	hud.show_playing()
 	player.start_movement()
 
@@ -48,6 +54,7 @@ func _physics_process(_delta: float) -> void:
 	_follow_player_upward()
 	platform_manager.update_for_camera(camera.position.y)
 	enemy_manager.update_for_camera(camera.position.y)
+	coin_manager.update_for_camera(camera.position.y)
 
 	var camera_bottom := camera.position.y + get_viewport_rect().size.y * 0.5
 	# Tighter death line: 35% of screen below camera center.
@@ -72,6 +79,11 @@ func _on_score_changed(new_score: int) -> void:
 func _on_game_over(final_score: int) -> void:
 	player.stop_movement()
 	enemy_manager.set_active(false)
+	coin_manager.set_active(false)
 	profile_store.update_high_score(final_score)
 	hud.set_high_score(profile_store.high_score)
 	hud.show_game_over(final_score)
+
+
+func _on_coin_collected() -> void:
+	profile_store.add_coins(1)
