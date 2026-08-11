@@ -22,13 +22,6 @@ Early development — architecture and research phase.
 - Power-ups, multiple platform types, enemies
 - Local high score, offline play
 
-## Monetization
-
-Hybrid ad-supported model: interstitial + rewarded video + banner + small IAP (remove ads, skins).
-
-## Documentation
-
-Internal design and architecture docs are kept locally under `docs/ai/` and are excluded from the repository.
 
 ## License
 
