@@ -1,18 +1,19 @@
 extends CharacterBody2D
 
-## Minimal M1 dragon controller: automatic jumping and horizontal steering.
+## Dragon controller: automatic jumping, steering, double jump, and glide.
 
 const GRAVITY := 2400.0
 const JUMP_VELOCITY := -1150.0
 const MOVE_SPEED := 520.0
-const TOUCH_TAP_MOVE_SECONDS := 0.22
+const DOUBLE_JUMP_COOLDOWN := 1.0
+
+@onready var input_controller := $InputController
+@onready var ability_controller := $AbilityController
 
 var active := false
 var _screen_width := 1080.0
-var _touch_direction := 0.0
-var _touch_index := -1
-var _touch_is_down := false
-var _tap_move_time_left := 0.0
+var _can_double_jump := true
+var _double_jump_cooldown_left := 0.0
 
 
 func _ready() -> void:
@@ -24,15 +25,29 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		return
 
-	if not _touch_is_down:
-		_tap_move_time_left = maxf(0.0, _tap_move_time_left - delta)
-		if is_zero_approx(_tap_move_time_left):
-			_touch_direction = 0.0
-
 	var keyboard_direction := Input.get_axis("ui_left", "ui_right")
-	var horizontal_input := clampf(keyboard_direction + _touch_direction, -1.0, 1.0)
+	var horizontal_input := clampf(
+		keyboard_direction + float(input_controller.get("horizontal_direction")),
+		-1.0,
+		1.0
+	)
 	velocity.x = horizontal_input * MOVE_SPEED
-	velocity.y += GRAVITY * delta
+
+	var on_floor_before_move := is_on_floor()
+	if on_floor_before_move:
+		_can_double_jump = true
+
+	if _double_jump_cooldown_left > 0.0:
+		_double_jump_cooldown_left = maxf(0.0, _double_jump_cooldown_left - delta)
+
+	var double_jump_requested := bool(input_controller.call("consume_double_jump_request"))
+	var is_gliding := bool(input_controller.get("glide_active")) and not on_floor_before_move and velocity.y > 0.0
+	var current_gravity := GRAVITY * 0.25 if is_gliding else GRAVITY
+	velocity.y += current_gravity * delta
+	if double_jump_requested and not on_floor_before_move and _can_double_jump and _double_jump_cooldown_left <= 0.0:
+		velocity.y = JUMP_VELOCITY
+		_can_double_jump = false
+		_double_jump_cooldown_left = DOUBLE_JUMP_COOLDOWN
 	var was_descending := velocity.y >= 0.0
 
 	move_and_slide()
@@ -40,37 +55,35 @@ func _physics_process(delta: float) -> void:
 	# One-way platform contacts become floors only while the player is descending.
 	if was_descending and is_on_floor():
 		_apply_platform_landing()
+		_can_double_jump = true
+		input_controller.call("cancel_glide_on_landing")
 
 	_wrap_around_screen()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not active or not event is InputEventScreenTouch:
-		return
-
-	var touch := event as InputEventScreenTouch
-	if touch.pressed and _touch_index == -1:
-		_touch_index = touch.index
-		_touch_is_down = true
-		_touch_direction = -1.0 if touch.position.x < _screen_width * 0.5 else 1.0
-		_tap_move_time_left = TOUCH_TAP_MOVE_SECONDS
-		get_viewport().set_input_as_handled()
-	elif not touch.pressed and touch.index == _touch_index:
-		_touch_index = -1
-		_touch_is_down = false
-		get_viewport().set_input_as_handled()
-
-
 func start_movement() -> void:
 	active = true
+	_can_double_jump = true
+	input_controller.call("set_active", true)
+	ability_controller.call("set_active", true)
 
 
 func stop_movement() -> void:
 	active = false
-	_touch_index = -1
-	_touch_is_down = false
-	_touch_direction = 0.0
-	_tap_move_time_left = 0.0
+	input_controller.call("set_active", false)
+	ability_controller.call("set_active", false)
+
+
+func initialize_abilities(
+		world: Node2D,
+		enemy_manager: Node,
+		camera: Camera2D
+	) -> void:
+	ability_controller.call("initialize", world, enemy_manager, camera)
+
+
+func request_fire() -> void:
+	ability_controller.call("request_fire")
 
 
 func get_jump_height() -> float:

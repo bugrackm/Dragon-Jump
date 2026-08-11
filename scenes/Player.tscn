@@ -1,6 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/InputController.gd" id="2_input"]
+[ext_resource type="Script" path="res://scripts/AbilityController.gd" id="3_ability"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 34.0
@@ -27,3 +29,8 @@ color = Color(0.22, 0.7, 0.26, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_player")
 
+[node name="InputController" type="Node" parent="."]
+script = ExtResource("2_input")
+
+[node name="AbilityController" type="Node" parent="."]
+script = ExtResource("3_ability")

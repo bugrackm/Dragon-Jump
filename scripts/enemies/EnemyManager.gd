@@ -95,6 +95,12 @@ func get_active_enemy_count() -> int:
 	return _enemies.size()
 
 
+func destroy_enemy(enemy: Area2D) -> void:
+	if is_instance_valid(enemy):
+		_enemies.erase(enemy)
+		enemy.queue_free()
+
+
 func _on_platform_spawned(
 		platform: Node2D,
 		spawn_index: int,

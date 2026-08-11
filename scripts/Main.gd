@@ -9,6 +9,7 @@ extends Node2D
 @onready var platform_manager = $World/PlatformManager
 @onready var enemy_manager = $World/EnemyManager
 @onready var player = $World/Player
+@onready var world: Node2D = $World
 @onready var camera: Camera2D = $World/Camera2D
 @onready var hud = $HUD
 
@@ -19,8 +20,11 @@ func _ready() -> void:
 	run_session.score_changed.connect(_on_score_changed)
 	run_session.game_over.connect(_on_game_over)
 	profile_store.high_score_changed.connect(hud.set_high_score)
+	hud.fire_requested.connect(player.request_fire)
+	player.ability_controller.cooldown_changed.connect(hud.set_fire_cooldown)
 
 	_highest_camera_y = camera.position.y
+	player.initialize_abilities(world, enemy_manager, camera)
 	run_session.start_new_run(run_seed, player.global_position.y)
 	enemy_manager.initialize(run_session, platform_manager, player)
 	platform_manager.initialize(
@@ -32,6 +36,7 @@ func _ready() -> void:
 	)
 	hud.set_score(0)
 	hud.set_high_score(profile_store.high_score)
+	hud.show_playing()
 	player.start_movement()
 
 

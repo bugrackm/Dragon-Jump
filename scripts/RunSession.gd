@@ -54,4 +54,3 @@ func _set_state(new_state: RunState) -> void:
 		return
 	state = new_state
 	state_changed.emit(state)
-

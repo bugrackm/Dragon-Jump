@@ -31,3 +31,6 @@ __pycache__/
 *.pyc
 # Godot editor cache
 .godot/
+
+# Godot UID files (editor-generated, non-functional)
+*.uid
