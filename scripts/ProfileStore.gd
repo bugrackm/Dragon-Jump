@@ -4,14 +4,18 @@ extends Node
 
 signal high_score_changed(new_high_score: int)
 signal coins_changed(new_total: int)
+signal settings_changed(key: String, value: Variant)
 
 const SAVE_PATH := "user://profile.cfg"
-const CURRENT_SCHEMA_VERSION := 2
+const CURRENT_SCHEMA_VERSION := 3
 const SECTION_PROFILE := "profile"
 const SECTION_ECONOMY := "economy"
+const SECTION_SETTINGS := "settings"
 
 var high_score := 0
 var total_coins := 0
+var sound_enabled := true
+var music_enabled := true
 var schema_version := CURRENT_SCHEMA_VERSION
 
 
@@ -47,9 +51,33 @@ func load_profile() -> void:
 	else:
 		total_coins = 0
 
+	var loaded_sound_enabled: Variant = config.get_value(
+		SECTION_SETTINGS,
+		"sound_enabled",
+		true
+	)
+	var loaded_music_enabled: Variant = config.get_value(
+		SECTION_SETTINGS,
+		"music_enabled",
+		true
+	)
+	var sound_is_valid := typeof(loaded_sound_enabled) == TYPE_BOOL
+	var music_is_valid := typeof(loaded_music_enabled) == TYPE_BOOL
+	sound_enabled = loaded_sound_enabled if sound_is_valid else true
+	music_enabled = loaded_music_enabled if music_is_valid else true
+
 	schema_version = CURRENT_SCHEMA_VERSION
 	var economy_missing := not config.has_section_key(SECTION_ECONOMY, "total_coins")
-	if loaded_schema_version != CURRENT_SCHEMA_VERSION or economy_missing:
+	var sound_missing := not config.has_section_key(SECTION_SETTINGS, "sound_enabled")
+	var music_missing := not config.has_section_key(SECTION_SETTINGS, "music_enabled")
+	if (
+		loaded_schema_version != CURRENT_SCHEMA_VERSION
+		or economy_missing
+		or sound_missing
+		or music_missing
+		or not sound_is_valid
+		or not music_is_valid
+	):
 		save_profile()
 
 
@@ -68,11 +96,33 @@ func add_coins(amount: int) -> void:
 	save_profile()
 
 
+func set_sound_enabled(value: bool) -> void:
+	sound_enabled = value
+	settings_changed.emit("sound_enabled", sound_enabled)
+	save_profile()
+
+
+func set_music_enabled(value: bool) -> void:
+	music_enabled = value
+	settings_changed.emit("music_enabled", music_enabled)
+	save_profile()
+
+
+func get_sound_enabled() -> bool:
+	return sound_enabled
+
+
+func get_music_enabled() -> bool:
+	return music_enabled
+
+
 func save_profile() -> bool:
 	var config := ConfigFile.new()
 	config.set_value(SECTION_PROFILE, "schema_version", CURRENT_SCHEMA_VERSION)
 	config.set_value(SECTION_PROFILE, "high_score", high_score)
 	config.set_value(SECTION_ECONOMY, "total_coins", total_coins)
+	config.set_value(SECTION_SETTINGS, "sound_enabled", sound_enabled)
+	config.set_value(SECTION_SETTINGS, "music_enabled", music_enabled)
 
 	var error := config.save(SAVE_PATH)
 	if error != OK:
@@ -85,3 +135,5 @@ func _reset_to_defaults() -> void:
 	schema_version = CURRENT_SCHEMA_VERSION
 	high_score = 0
 	total_coins = 0
+	sound_enabled = true
+	music_enabled = true

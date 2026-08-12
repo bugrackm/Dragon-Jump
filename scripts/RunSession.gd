@@ -4,11 +4,13 @@ extends Node
 
 signal state_changed(new_state: int)
 signal score_changed(new_score: int)
+signal run_coins_changed(amount: int)
 signal game_over(final_score: int)
 
 enum RunState {
 	READY,
 	PLAYING,
+	PAUSED,
 	GAME_OVER,
 }
 
@@ -16,6 +18,7 @@ const DEFAULT_SEED := 13_371_337
 
 var state: RunState = RunState.READY
 var score := 0
+var run_coins := 0
 var rng := RandomNumberGenerator.new()
 var rng_seed := DEFAULT_SEED
 var _start_y := 0.0
@@ -26,8 +29,33 @@ func start_new_run(seed_value: int, start_y: float) -> void:
 	rng.seed = rng_seed
 	_start_y = start_y
 	score = 0
+	run_coins = 0
 	_set_state(RunState.PLAYING)
 	score_changed.emit(score)
+	run_coins_changed.emit(run_coins)
+
+
+func add_run_coin() -> void:
+	run_coins += 1
+	run_coins_changed.emit(run_coins)
+
+
+func pause_run() -> bool:
+	if state != RunState.PLAYING:
+		return false
+	_set_state(RunState.PAUSED)
+	return true
+
+
+func resume_run() -> bool:
+	if state != RunState.PAUSED:
+		return false
+	_set_state(RunState.PLAYING)
+	return true
+
+
+func is_paused() -> bool:
+	return state == RunState.PAUSED
 
 
 func update_player_altitude(player_y: float) -> void:
