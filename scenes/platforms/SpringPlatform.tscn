@@ -1,0 +1,33 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/platforms/SpringPlatform.gd" id="1_spring"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(240, 36)
+
+[node name="SpringPlatform" type="StaticBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_spring")
+
+[node name="Surface" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, 18, -120, 18)
+color = Color(0.95, 0.85, 0.15, 1)
+
+[node name="TopHighlight" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, -8, -120, -8)
+color = Color(1, 0.97, 0.5, 1)
+
+[node name="SpringCoil" type="Line2D" parent="."]
+points = PackedVector2Array(-30, 14, -18, 7, -6, 14, 6, 7, 18, 14, 30, 7)
+width = 5.0
+default_color = Color(0.42, 0.35, 0.04, 1)
+
+[node name="UpArrow" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, -15, 24, 2, 10, 2, 10, 12, -10, 12, -10, 2, -24, 2)
+color = Color(0.42, 0.35, 0.04, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+one_way_collision_margin = 12.0

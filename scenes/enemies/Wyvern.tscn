@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/enemies/Wyvern.gd" id="1_wyvern"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wyvern"]
+size = Vector2(50, 40)
+
+[node name="Wyvern" type="Area2D"]
+collision_layer = 4
+collision_mask = 1
+monitoring = true
+script = ExtResource("1_wyvern")
+
+[node name="LeftWing" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-8, -4, -25, -19, -20, 8, -7, 12)
+color = Color(0.32, 0.14, 0.42, 1)
+
+[node name="RightWing" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(8, -4, 25, -19, 20, 8, 7, 12)
+color = Color(0.32, 0.14, 0.42, 1)
+
+[node name="Body" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-18, -7, -10, -16, 10, -15, 22, -4, 15, 15, -11, 16, -22, 4)
+color = Color(0.4, 0.2, 0.5, 1)
+
+[node name="Eye" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(9, -8, 14, -8, 14, -3, 9, -3)
+color = Color(1, 0.82, 0.2, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_wyvern")

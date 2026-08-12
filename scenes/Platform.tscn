@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(240, 36)
+
+[node name="Platform" type="StaticBody2D"]
+collision_layer = 2
+collision_mask = 1
+
+[node name="Surface" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, 18, -120, 18)
+color = Color(0.96, 0.64, 0.18, 1)
+
+[node name="TopHighlight" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-120, -18, 120, -18, 120, -8, -120, -8)
+color = Color(1, 0.86, 0.38, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_platform")
+one_way_collision = true
+one_way_collision_margin = 12.0
+
