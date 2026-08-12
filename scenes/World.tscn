@@ -1,0 +1,40 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/PlatformManager.gd" id="1_manager"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/Platform.tscn" id="3_platform"]
+[ext_resource type="PackedScene" path="res://scenes/platforms/MovingPlatform.tscn" id="4_moving"]
+[ext_resource type="PackedScene" path="res://scenes/platforms/BreakablePlatform.tscn" id="5_breakable"]
+[ext_resource type="PackedScene" path="res://scenes/platforms/DisappearingPlatform.tscn" id="6_disappearing"]
+[ext_resource type="PackedScene" path="res://scenes/platforms/SpringPlatform.tscn" id="7_spring"]
+[ext_resource type="Script" path="res://scripts/enemies/EnemyManager.gd" id="8_enemy_manager"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/Wyvern.tscn" id="9_wyvern"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/StaticMonster.tscn" id="10_static_monster"]
+[ext_resource type="Script" path="res://scripts/CoinManager.gd" id="11_coin_manager"]
+[ext_resource type="PackedScene" path="res://scenes/Coin.tscn" id="12_coin"]
+
+[node name="World" type="Node2D"]
+
+[node name="PlatformManager" type="Node2D" parent="."]
+script = ExtResource("1_manager")
+platform_scene = ExtResource("3_platform")
+moving_platform_scene = ExtResource("4_moving")
+breakable_platform_scene = ExtResource("5_breakable")
+disappearing_platform_scene = ExtResource("6_disappearing")
+spring_platform_scene = ExtResource("7_spring")
+
+[node name="CoinManager" type="Node2D" parent="."]
+script = ExtResource("11_coin_manager")
+coin_scene = ExtResource("12_coin")
+
+[node name="EnemyManager" type="Node2D" parent="."]
+script = ExtResource("8_enemy_manager")
+wyvern_scene = ExtResource("9_wyvern")
+static_monster_scene = ExtResource("10_static_monster")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+position = Vector2(540, 1678)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(540, 960)
+position_smoothing_enabled = false
