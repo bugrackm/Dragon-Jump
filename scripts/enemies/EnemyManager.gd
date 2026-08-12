@@ -51,6 +51,12 @@ var _platform_records: Array[PlatformRecord] = []
 var _enemies: Array[Area2D] = []
 var _platforms_until_opportunity := 0
 var _active := false
+var _difficulty_factor := 0.0
+var _max_concurrent_enemies := MAX_CONCURRENT_ENEMIES
+var _min_platforms_between := MIN_PLATFORMS_BETWEEN_OPPORTUNITIES
+var _max_platforms_between := MAX_PLATFORMS_BETWEEN_OPPORTUNITIES
+var _wyvern_speed_min := WYVERN_SPEED_MIN
+var _wyvern_speed_max := WYVERN_SPEED_MAX
 
 
 func initialize(
@@ -66,10 +72,47 @@ func initialize(
 	_enemies.clear()
 	_platforms_until_opportunity = 0
 	_active = true
+	_difficulty_factor = 0.0
+	_max_concurrent_enemies = MAX_CONCURRENT_ENEMIES
+	_min_platforms_between = MIN_PLATFORMS_BETWEEN_OPPORTUNITIES
+	_max_platforms_between = MAX_PLATFORMS_BETWEEN_OPPORTUNITIES
+	_wyvern_speed_min = WYVERN_SPEED_MIN
+	_wyvern_speed_max = WYVERN_SPEED_MAX
 
 	var callback := Callable(self, "_on_platform_spawned")
 	if not _platform_manager.is_connected("platform_spawned", callback):
 		_platform_manager.connect("platform_spawned", callback)
+
+
+func update_difficulty(factor: float) -> void:
+	_difficulty_factor = clampf(factor, 0.0, 1.0)
+	_max_concurrent_enemies = int(round(lerpf(
+		float(MAX_CONCURRENT_ENEMIES),
+		7.0,
+		_difficulty_factor
+	)))
+	_min_platforms_between = int(round(lerpf(
+		float(MIN_PLATFORMS_BETWEEN_OPPORTUNITIES),
+		2.0,
+		_difficulty_factor
+	)))
+	_max_platforms_between = int(round(lerpf(
+		float(MAX_PLATFORMS_BETWEEN_OPPORTUNITIES),
+		3.0,
+		_difficulty_factor
+	)))
+	_max_platforms_between = maxi(_max_platforms_between, _min_platforms_between)
+	_wyvern_speed_min = int(round(lerpf(
+		WYVERN_SPEED_MIN,
+		220.0,
+		_difficulty_factor
+	)))
+	_wyvern_speed_max = int(round(lerpf(
+		WYVERN_SPEED_MAX,
+		400.0,
+		_difficulty_factor
+	)))
+	_wyvern_speed_max = maxf(_wyvern_speed_max, _wyvern_speed_min)
 
 
 func update_for_camera(camera_y: float) -> void:
@@ -133,15 +176,15 @@ func _on_platform_spawned(
 
 	_prune_enemies()
 	var spawn_wyvern := _enemy_rng.randf() < WYVERN_WEIGHT
-	if _enemies.size() < MAX_CONCURRENT_ENEMIES:
+	if _enemies.size() < _max_concurrent_enemies:
 		if spawn_wyvern and previous_record != null:
 			_try_spawn_wyvern(previous_record, current_record)
 		elif not spawn_wyvern:
 			_try_spawn_static_monster(platform, platform_type)
 
 	_platforms_until_opportunity = _enemy_rng.randi_range(
-		MIN_PLATFORMS_BETWEEN_OPPORTUNITIES,
-		MAX_PLATFORMS_BETWEEN_OPPORTUNITIES
+		_min_platforms_between,
+		_max_platforms_between
 	)
 
 
@@ -155,7 +198,7 @@ func _try_spawn_wyvern(lower_platform: PlatformRecord, upper_platform: PlatformR
 		)
 		var center_x := _enemy_rng.randf_range(half_range, SCREEN_WIDTH - half_range)
 		var spawn_y := _enemy_rng.randf_range(gap_top, gap_bottom)
-		var speed := _enemy_rng.randf_range(WYVERN_SPEED_MIN, WYVERN_SPEED_MAX)
+		var speed := _enemy_rng.randf_range(_wyvern_speed_min, _wyvern_speed_max)
 		var phase := _enemy_rng.randf_range(0.0, TAU)
 		if _is_wyvern_position_blocked(center_x, spawn_y, half_range):
 			continue

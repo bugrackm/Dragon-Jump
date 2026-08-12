@@ -15,9 +15,11 @@ extends Node2D
 @onready var hud = $HUD
 
 var _highest_camera_y := 960.0
+var _last_difficulty_factor := -1.0
 
 
 func _ready() -> void:
+	_last_difficulty_factor = -1.0
 	run_session.score_changed.connect(_on_score_changed)
 	run_session.game_over.connect(_on_game_over)
 	profile_store.high_score_changed.connect(hud.set_high_score)
@@ -51,6 +53,19 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	run_session.update_player_altitude(player.global_position.y)
+	var difficulty_factor: float = run_session.get_difficulty_factor()
+	var reached_new_endpoint := (
+		difficulty_factor != _last_difficulty_factor
+		and difficulty_factor in [0.0, 1.0]
+	)
+	if (
+		reached_new_endpoint
+		or absf(difficulty_factor - _last_difficulty_factor) >= 0.01
+	):
+		platform_manager.update_difficulty(difficulty_factor)
+		enemy_manager.update_difficulty(difficulty_factor)
+		coin_manager.update_difficulty(difficulty_factor)
+		_last_difficulty_factor = difficulty_factor
 	_follow_player_upward()
 	platform_manager.update_for_camera(camera.position.y)
 	enemy_manager.update_for_camera(camera.position.y)

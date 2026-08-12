@@ -28,6 +28,8 @@ var _camera: Camera2D
 var _platform_manager: Node2D
 var _coins: Array[Area2D] = []
 var _active := false
+var _difficulty_factor := 0.0
+var _coin_chance := PLATFORM_COIN_CHANCE
 
 
 func initialize(
@@ -42,6 +44,8 @@ func initialize(
 	_coin_rng.seed = run_rng_seed * 7 + 3
 	_coins.clear()
 	_active = true
+	_difficulty_factor = 0.0
+	_coin_chance = PLATFORM_COIN_CHANCE
 
 	var callback := Callable(self, "_on_platform_spawned")
 	if not _platform_manager.is_connected("platform_spawned", callback):
@@ -52,6 +56,11 @@ func initialize(
 			callback,
 			Object.CONNECT_DEFERRED
 		)
+
+
+func update_difficulty(factor: float) -> void:
+	_difficulty_factor = clampf(factor, 0.0, 1.0)
+	_coin_chance = lerpf(PLATFORM_COIN_CHANCE, 0.65, _difficulty_factor)
 
 
 func update_for_camera(camera_y: float) -> void:
@@ -97,7 +106,7 @@ func _on_platform_spawned(
 		return
 	if bool(platform.get_meta("has_static_monster", false)):
 		return
-	if _coin_rng.randf() >= PLATFORM_COIN_CHANCE:
+	if _coin_rng.randf() >= _coin_chance:
 		return
 
 	var coin := _create_coin()

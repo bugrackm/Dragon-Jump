@@ -41,6 +41,9 @@ var _move_speed := 520.0
 var _jump_height := 275.0
 var _camera_y := SCREEN_HEIGHT * 0.5
 var _initialized := false
+var _difficulty_factor := 0.0
+var _moving_speed_min := MOVING_SPEED_MIN
+var _moving_speed_max := MOVING_SPEED_MAX
 
 
 func initialize(
@@ -59,6 +62,9 @@ func initialize(
 	_highest_platform_travel_half_width = 0.0
 	_last_platform_type = PLATFORM_TYPE_STATIC
 	_spawned_count = 0
+	_difficulty_factor = 0.0
+	_moving_speed_min = MOVING_SPEED_MIN
+	_moving_speed_max = MOVING_SPEED_MAX
 
 	_spawn_platform(start_platform_position, PLATFORM_TYPE_STATIC)
 	_fill_above_camera()
@@ -74,6 +80,12 @@ func update_for_camera(camera_y: float) -> void:
 	_free_platforms_below_camera()
 
 
+func update_difficulty(factor: float) -> void:
+	_difficulty_factor = clampf(factor, 0.0, 1.0)
+	_moving_speed_min = lerpf(MOVING_SPEED_MIN, 80.0, _difficulty_factor)
+	_moving_speed_max = lerpf(MOVING_SPEED_MAX, 160.0, _difficulty_factor)
+
+
 func _fill_above_camera() -> void:
 	var spawn_ceiling := _camera_y - SCREEN_HEIGHT * 0.5 - TOP_SPAWN_BUFFER
 	while _highest_platform_position.y > spawn_ceiling:
@@ -83,13 +95,21 @@ func _fill_above_camera() -> void:
 func _spawn_next_platform() -> void:
 	var max_vertical_gap := _jump_height * 0.8
 	var safe_region := _spawned_count < SAFE_PLATFORM_COUNT
-	var gap_min_factor := 0.55 if safe_region else 0.62
+	var gap_min_factor: float
+	var gap_max_factor: float
+	if safe_region:
+		gap_min_factor = 0.55
+		gap_max_factor = 0.76
+	else:
+		gap_min_factor = lerpf(0.62, 0.70, _difficulty_factor)
+		gap_max_factor = lerpf(1.0, 1.1, _difficulty_factor)
 	# Non-static platforms (breakable, disappearing) are hazards the player
 	# can fall through. Reduce the vertical gap after them so the next static
 	# platform is always comfortably within reach even if the player drops.
-	var gap_max_factor := 0.76 if safe_region else 1.0
 	if _last_platform_type in [PLATFORM_TYPE_BREAKABLE, PLATFORM_TYPE_DISAPPEARING]:
 		gap_max_factor = 0.65
+		if not safe_region:
+			gap_min_factor = minf(gap_min_factor, 0.64)
 	var vertical_gap := _rng.randf_range(
 		max_vertical_gap * gap_min_factor,
 		max_vertical_gap * gap_max_factor
@@ -115,7 +135,7 @@ func _spawn_next_platform() -> void:
 	var next_travel_half_width := 0.0
 	if platform_type == PLATFORM_TYPE_MOVING:
 		moving_range = _rng.randf_range(MOVING_RANGE_MIN, MOVING_RANGE_MAX)
-		moving_speed = _rng.randf_range(MOVING_SPEED_MIN, MOVING_SPEED_MAX)
+		moving_speed = _rng.randf_range(_moving_speed_min, _moving_speed_max)
 		next_travel_half_width = moving_range * 0.5
 
 	# Both travel envelopes count against the landing budget. This makes even the
@@ -151,14 +171,18 @@ func _select_platform_type() -> StringName:
 	if _last_platform_type != PLATFORM_TYPE_STATIC:
 		return PLATFORM_TYPE_STATIC
 
+	var static_thresh := lerpf(0.50, 0.30, _difficulty_factor)
+	var moving_thresh := static_thresh + lerpf(0.15, 0.20, _difficulty_factor)
+	var breakable_thresh := moving_thresh + lerpf(0.12, 0.20, _difficulty_factor)
+	var disappearing_thresh := breakable_thresh + lerpf(0.10, 0.18, _difficulty_factor)
 	var roll := _rng.randf()
-	if roll < 0.50:
+	if roll < static_thresh:
 		return PLATFORM_TYPE_STATIC
-	if roll < 0.65:
+	if roll < moving_thresh:
 		return PLATFORM_TYPE_MOVING
-	if roll < 0.77:
+	if roll < breakable_thresh:
 		return PLATFORM_TYPE_BREAKABLE
-	if roll < 0.87:
+	if roll < disappearing_thresh:
 		return PLATFORM_TYPE_DISAPPEARING
 	return PLATFORM_TYPE_SPRING
 
@@ -175,6 +199,9 @@ func _spawn_platform(
 	platform.set_meta("platform_type", platform_type)
 	if platform_type == PLATFORM_TYPE_MOVING:
 		platform.call("configure_movement", moving_range, moving_speed)
+		# MovingPlatform's M2a configure method clamps to its original 120 cap.
+		# Apply the difficulty-scaled runtime value without changing that owned script.
+		platform.set("travel_speed", moving_speed)
 	add_child(platform)
 	_platforms.append(platform)
 	_spawned_count += 1

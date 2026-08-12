@@ -9,6 +9,7 @@ const DOUBLE_JUMP_COOLDOWN := 1.0
 
 @onready var input_controller := $InputController
 @onready var ability_controller := $AbilityController
+@onready var animation_controller := $AnimationController
 
 var active := false
 var _screen_width := 1080.0
@@ -18,6 +19,7 @@ var _double_jump_cooldown_left := 0.0
 
 func _ready() -> void:
 	_screen_width = get_viewport_rect().size.x
+	ability_controller.cooldown_changed.connect(_on_fire_cooldown_changed)
 
 
 func _physics_process(delta: float) -> void:
@@ -41,6 +43,7 @@ func _physics_process(delta: float) -> void:
 		_double_jump_cooldown_left = maxf(0.0, _double_jump_cooldown_left - delta)
 
 	var double_jump_requested := bool(input_controller.call("consume_double_jump_request"))
+	var double_jump_just_triggered := false
 	var is_gliding := bool(input_controller.get("glide_active")) and not on_floor_before_move and velocity.y > 0.0
 	var current_gravity := GRAVITY * 0.25 if is_gliding else GRAVITY
 	velocity.y += current_gravity * delta
@@ -48,6 +51,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = JUMP_VELOCITY
 		_can_double_jump = false
 		_double_jump_cooldown_left = DOUBLE_JUMP_COOLDOWN
+		double_jump_just_triggered = true
 	var was_descending := velocity.y >= 0.0
 
 	move_and_slide()
@@ -59,6 +63,14 @@ func _physics_process(delta: float) -> void:
 		input_controller.call("cancel_glide_on_landing")
 
 	_wrap_around_screen()
+	if double_jump_just_triggered:
+		animation_controller.call("trigger_double_jump")
+	var animation_is_gliding := (
+		bool(input_controller.get("glide_active"))
+		and not is_on_floor()
+		and velocity.y > 0.0
+	)
+	animation_controller.call("update_animation", animation_is_gliding)
 
 
 func start_movement() -> void:
@@ -72,6 +84,7 @@ func stop_movement() -> void:
 	active = false
 	input_controller.call("set_active", false)
 	ability_controller.call("set_active", false)
+	animation_controller.call("stop")
 
 
 func initialize_abilities(
@@ -110,3 +123,8 @@ func _wrap_around_screen() -> void:
 		global_position.x = _screen_width
 	elif global_position.x > _screen_width:
 		global_position.x = 0.0
+
+
+func _on_fire_cooldown_changed(is_on_cooldown: bool) -> void:
+	if is_on_cooldown:
+		animation_controller.call("trigger_fire")

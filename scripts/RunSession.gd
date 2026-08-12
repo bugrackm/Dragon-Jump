@@ -41,6 +41,10 @@ func update_player_altitude(player_y: float) -> void:
 		score_changed.emit(score)
 
 
+func get_difficulty_factor() -> float:
+	return clampf(float(score) / 5000.0, 0.0, 1.0)
+
+
 func end_run() -> void:
 	if state != RunState.PLAYING:
 		return
