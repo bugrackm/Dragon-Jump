@@ -6,6 +6,7 @@ const MAIN_MENU_SCENE := preload("res://scenes/MainMenu.tscn")
 const GAME_OVER_SCREEN_SCENE := preload("res://scenes/GameOverScreen.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/SettingsMenu.tscn")
 const PAUSE_OVERLAY_SCENE := preload("res://scenes/PauseOverlay.tscn")
+const SHOP_SCREEN_SCENE := preload("res://scenes/ShopScreen.tscn")
 
 @export var run_seed := 0
 @export var world_scene: PackedScene
@@ -18,6 +19,7 @@ var _main_menu: CanvasLayer
 var _game_over_screen: CanvasLayer
 var _settings_menu: CanvasLayer
 var _pause_overlay: CanvasLayer
+var _shop_screen: CanvasLayer
 var _settings_return_to_pause := false
 
 var _current_world: Node2D
@@ -53,6 +55,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey:
 		return
 	if event.keycode != KEY_ESCAPE or not event.pressed or event.echo:
+		return
+	if is_instance_valid(_shop_screen) and _shop_screen.visible:
+		_hide_shop()
+		get_viewport().set_input_as_handled()
 		return
 
 	if is_instance_valid(_settings_menu) and _settings_menu.visible:
@@ -122,6 +128,12 @@ func _create_persistent_overlays() -> void:
 	_pause_overlay.connect("quit_to_menu_requested", _quit_to_menu)
 	_pause_overlay.visible = false
 
+	_shop_screen = SHOP_SCREEN_SCENE.instantiate() as CanvasLayer
+	add_child(_shop_screen)
+	_shop_screen.connect("back_requested", _hide_shop)
+	_shop_screen.connect("purchase_made", _on_shop_purchase_made)
+	_shop_screen.visible = false
+
 
 func _ensure_main_menu() -> void:
 	if is_instance_valid(_main_menu):
@@ -130,6 +142,7 @@ func _ensure_main_menu() -> void:
 	add_child(_main_menu)
 	_main_menu.connect("play_requested", _start_game)
 	_main_menu.connect("settings_requested", _show_settings)
+	_main_menu.connect("shop_requested", _show_shop)
 
 
 func _show_main_menu() -> void:
@@ -152,6 +165,7 @@ func _start_game() -> void:
 	_settings_menu.visible = false
 	_game_over_screen.visible = false
 	_pause_overlay.visible = false
+	_shop_screen.visible = false
 	get_tree().paused = false
 
 	_current_world = world_scene.instantiate() as Node2D
@@ -174,6 +188,11 @@ func _setup_world() -> void:
 	_coin_manager.coin_collected.connect(_on_coin_collected)
 	_enemy_manager.enemy_destroyed.connect(_coin_manager._on_enemy_destroyed)
 	_player.ability_controller.cooldown_changed.connect(hud.set_fire_cooldown)
+	_player.configure_abilities(
+		profile_store.is_double_jump_unlocked(),
+		profile_store.is_glide_unlocked(),
+		profile_store.get_fire_breath_level()
+	)
 
 	_last_difficulty_factor = -1.0
 	_highest_camera_y = _camera.position.y
@@ -233,6 +252,7 @@ func _quit_to_menu() -> void:
 	_game_over_screen.visible = false
 	_pause_overlay.visible = false
 	_settings_menu.visible = false
+	_shop_screen.visible = false
 	_show_main_menu()
 
 
@@ -254,6 +274,38 @@ func _hide_settings() -> void:
 	if _settings_return_to_pause:
 		_settings_return_to_pause = false
 		_pause_overlay.visible = true
+
+
+func _show_shop() -> void:
+	if run_session.state != run_session.RunState.READY:
+		return
+	if not is_instance_valid(_main_menu) or not _main_menu.visible:
+		return
+	if (
+		_settings_menu.visible
+		or _pause_overlay.visible
+		or _game_over_screen.visible
+		or _shop_screen.visible
+	):
+		return
+
+	_main_menu.visible = false
+	_shop_screen.call("open", profile_store)
+	_shop_screen.visible = true
+	_shop_screen.call("grab_focus_on_first_button")
+
+
+func _hide_shop() -> void:
+	if not is_instance_valid(_shop_screen) or not _shop_screen.visible:
+		return
+	_shop_screen.visible = false
+	_show_main_menu()
+
+
+func _on_shop_purchase_made() -> void:
+	hud.set_coins(profile_store.total_coins)
+	if is_instance_valid(_main_menu):
+		_main_menu.call("refresh", profile_store)
 
 
 func _free_current_world() -> void:

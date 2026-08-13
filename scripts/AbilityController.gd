@@ -4,7 +4,6 @@ extends Node
 
 signal cooldown_changed(is_on_cooldown: bool)
 
-const FIRE_COOLDOWN_SECONDS := 0.5
 const FIRE_PROJECTILE_SCENE := preload("res://scenes/FireProjectile.tscn")
 const PROJECTILE_SPAWN_OFFSET := Vector2(0.0, -58.0)
 
@@ -14,6 +13,7 @@ const PROJECTILE_SPAWN_OFFSET := Vector2(0.0, -58.0)
 var _world: Node2D
 var _enemy_manager: Node
 var _camera: Camera2D
+var _fire_cooldown_seconds := 0.5
 var _cooldown_left := 0.0
 var _active := false
 var _projectiles: Array[Area2D] = []
@@ -51,9 +51,13 @@ func request_fire() -> void:
 	):
 		return
 
-	_cooldown_left = FIRE_COOLDOWN_SECONDS
+	_cooldown_left = _fire_cooldown_seconds
 	cooldown_changed.emit(true)
 	_spawn_projectile()
+
+
+func set_fire_cooldown(seconds: float) -> void:
+	_fire_cooldown_seconds = maxf(0.0, seconds)
 
 
 func set_active(is_active: bool) -> void:

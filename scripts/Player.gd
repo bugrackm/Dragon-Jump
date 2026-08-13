@@ -12,6 +12,8 @@ const DOUBLE_JUMP_COOLDOWN := 1.0
 @onready var animation_controller := $AnimationController
 
 var active := false
+var double_jump_enabled := false
+var glide_enabled := false
 var _screen_width := 1080.0
 var _can_double_jump := true
 var _double_jump_cooldown_left := 0.0
@@ -44,10 +46,20 @@ func _physics_process(delta: float) -> void:
 
 	var double_jump_requested := bool(input_controller.call("consume_double_jump_request"))
 	var double_jump_just_triggered := false
-	var is_gliding := bool(input_controller.get("glide_active")) and not on_floor_before_move and velocity.y > 0.0
+	var can_double_jump := (
+		double_jump_enabled
+		and _can_double_jump
+		and _double_jump_cooldown_left <= 0.0
+	)
+	var is_gliding := (
+		glide_enabled
+		and bool(input_controller.get("glide_active"))
+		and not on_floor_before_move
+		and velocity.y > 0.0
+	)
 	var current_gravity := GRAVITY * 0.25 if is_gliding else GRAVITY
 	velocity.y += current_gravity * delta
-	if double_jump_requested and not on_floor_before_move and _can_double_jump and _double_jump_cooldown_left <= 0.0:
+	if double_jump_requested and not on_floor_before_move and can_double_jump:
 		velocity.y = JUMP_VELOCITY
 		_can_double_jump = false
 		_double_jump_cooldown_left = DOUBLE_JUMP_COOLDOWN
@@ -66,11 +78,21 @@ func _physics_process(delta: float) -> void:
 	if double_jump_just_triggered:
 		animation_controller.call("trigger_double_jump")
 	var animation_is_gliding := (
-		bool(input_controller.get("glide_active"))
+		glide_enabled
+		and bool(input_controller.get("glide_active"))
 		and not is_on_floor()
 		and velocity.y > 0.0
 	)
 	animation_controller.call("update_animation", animation_is_gliding)
+
+
+func configure_abilities(double_jump: bool, glide: bool, fire_level: int) -> void:
+	double_jump_enabled = double_jump
+	glide_enabled = glide
+	ability_controller.call(
+		"set_fire_cooldown",
+		ProfileStore.get_fire_cooldown_for_level(fire_level)
+	)
 
 
 func start_movement() -> void:

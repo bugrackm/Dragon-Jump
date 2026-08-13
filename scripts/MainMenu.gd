@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal play_requested
 signal settings_requested
+signal shop_requested
 
 @onready var high_score_label: Label = $CenterContainer/VBoxContainer/HighScoreLabel
 @onready var coin_label: Label = $CenterContainer/VBoxContainer/CoinLabel
@@ -13,6 +14,9 @@ func _ready() -> void:
 	)
 	$CenterContainer/VBoxContainer/SettingsButton.pressed.connect(
 		func() -> void: settings_requested.emit()
+	)
+	$CenterContainer/VBoxContainer/ShopButton.pressed.connect(
+		func() -> void: shop_requested.emit()
 	)
 
 
