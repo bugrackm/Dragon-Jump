@@ -17,6 +17,7 @@ var glide_enabled := false
 var _screen_width := 1080.0
 var _can_double_jump := true
 var _double_jump_cooldown_left := 0.0
+var _glide_sound_active := false
 
 
 func _ready() -> void:
@@ -77,12 +78,14 @@ func _physics_process(delta: float) -> void:
 	_wrap_around_screen()
 	if double_jump_just_triggered:
 		animation_controller.call("trigger_double_jump")
+		_play_sfx(&"sfx_double_jump")
 	var animation_is_gliding := (
 		glide_enabled
 		and bool(input_controller.get("glide_active"))
 		and not is_on_floor()
 		and velocity.y > 0.0
 	)
+	_set_glide_sound_active(animation_is_gliding)
 	animation_controller.call("update_animation", animation_is_gliding)
 
 
@@ -104,6 +107,7 @@ func start_movement() -> void:
 
 func stop_movement() -> void:
 	active = false
+	_set_glide_sound_active(false)
 	input_controller.call("set_active", false)
 	ability_controller.call("set_active", false)
 	animation_controller.call("stop")
@@ -126,6 +130,7 @@ func get_jump_height() -> float:
 
 
 func _apply_platform_landing() -> void:
+	_play_sfx(&"sfx_jump")
 	for collision_index in get_slide_collision_count():
 		var collision := get_slide_collision(collision_index)
 		if collision.get_normal().y < -0.5:
@@ -150,3 +155,26 @@ func _wrap_around_screen() -> void:
 func _on_fire_cooldown_changed(is_on_cooldown: bool) -> void:
 	if is_on_cooldown:
 		animation_controller.call("trigger_fire")
+
+
+func _set_glide_sound_active(is_gliding: bool) -> void:
+	if is_gliding == _glide_sound_active:
+		return
+	_glide_sound_active = is_gliding
+	var audio_manager := _get_audio_manager()
+	if audio_manager == null:
+		return
+	if _glide_sound_active:
+		audio_manager.call("play_sfx", &"sfx_glide")
+	else:
+		audio_manager.call("stop_sfx", &"sfx_glide")
+
+
+func _play_sfx(sound_name: StringName) -> void:
+	var audio_manager := _get_audio_manager()
+	if audio_manager != null:
+		audio_manager.call("play_sfx", sound_name)
+
+
+func _get_audio_manager() -> Node:
+	return get_tree().get_first_node_in_group(&"audio_manager")

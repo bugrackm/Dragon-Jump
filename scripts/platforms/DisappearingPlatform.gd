@@ -29,6 +29,7 @@ func on_player_landed(_player: CharacterBody2D) -> void:
 
 
 func _disappear() -> void:
+	_play_sfx(&"sfx_disappear")
 	_collision_shape.set_deferred("disabled", true)
 	if _pulse_tween:
 		_pulse_tween.kill()
@@ -36,3 +37,9 @@ func _disappear() -> void:
 	tween.tween_property(_visual, "modulate:a", 0.0, FADE_DURATION)
 	await tween.finished
 	queue_free()
+
+
+func _play_sfx(sound_name: StringName) -> void:
+	var audio_manager := get_tree().get_first_node_in_group(&"audio_manager")
+	if audio_manager != null:
+		audio_manager.call("play_sfx", sound_name)

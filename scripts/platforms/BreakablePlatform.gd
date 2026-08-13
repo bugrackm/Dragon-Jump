@@ -25,8 +25,15 @@ func on_player_landed(_player: CharacterBody2D) -> void:
 
 
 func _break() -> void:
+	_play_sfx(&"sfx_break")
 	_collision_shape.set_deferred("disabled", true)
 	var tween := create_tween()
 	tween.tween_property(_visual, "scale", Vector2.ZERO, BREAK_ANIMATION_DURATION)
 	await tween.finished
 	queue_free()
+
+
+func _play_sfx(sound_name: StringName) -> void:
+	var audio_manager := get_tree().get_first_node_in_group(&"audio_manager")
+	if audio_manager != null:
+		audio_manager.call("play_sfx", sound_name)
