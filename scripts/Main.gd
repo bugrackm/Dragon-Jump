@@ -13,6 +13,7 @@ const SHOP_SCREEN_SCENE := preload("res://scenes/ShopScreen.tscn")
 
 @onready var run_session = $RunSession
 @onready var profile_store = $ProfileStore
+@onready var audio_manager: AudioManager = $AudioManager
 @onready var hud = $HUD
 
 var _main_menu: CanvasLayer
@@ -35,6 +36,7 @@ var _last_difficulty_factor := -1.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	audio_manager.initialize(profile_store)
 	run_session.score_changed.connect(_on_score_changed)
 	run_session.game_over.connect(_on_game_over)
 	profile_store.high_score_changed.connect(hud.set_high_score)
@@ -112,17 +114,20 @@ func _physics_process(_delta: float) -> void:
 func _create_persistent_overlays() -> void:
 	_settings_menu = SETTINGS_MENU_SCENE.instantiate() as CanvasLayer
 	add_child(_settings_menu)
+	_settings_menu.call("set_audio_manager", audio_manager)
 	_settings_menu.connect("back_requested", _hide_settings)
 	_settings_menu.visible = false
 
 	_game_over_screen = GAME_OVER_SCREEN_SCENE.instantiate() as CanvasLayer
 	add_child(_game_over_screen)
+	_game_over_screen.call("set_audio_manager", audio_manager)
 	_game_over_screen.connect("retry_requested", _retry)
 	_game_over_screen.connect("menu_requested", _quit_to_menu)
 	_game_over_screen.visible = false
 
 	_pause_overlay = PAUSE_OVERLAY_SCENE.instantiate() as CanvasLayer
 	add_child(_pause_overlay)
+	_pause_overlay.call("set_audio_manager", audio_manager)
 	_pause_overlay.connect("resume_requested", _resume_game)
 	_pause_overlay.connect("settings_requested", _show_settings_from_pause)
 	_pause_overlay.connect("quit_to_menu_requested", _quit_to_menu)
@@ -130,6 +135,7 @@ func _create_persistent_overlays() -> void:
 
 	_shop_screen = SHOP_SCREEN_SCENE.instantiate() as CanvasLayer
 	add_child(_shop_screen)
+	_shop_screen.call("set_audio_manager", audio_manager)
 	_shop_screen.connect("back_requested", _hide_shop)
 	_shop_screen.connect("purchase_made", _on_shop_purchase_made)
 	_shop_screen.visible = false
@@ -140,6 +146,7 @@ func _ensure_main_menu() -> void:
 		return
 	_main_menu = MAIN_MENU_SCENE.instantiate() as CanvasLayer
 	add_child(_main_menu)
+	_main_menu.call("set_audio_manager", audio_manager)
 	_main_menu.connect("play_requested", _start_game)
 	_main_menu.connect("settings_requested", _show_settings)
 	_main_menu.connect("shop_requested", _show_shop)
@@ -187,7 +194,9 @@ func _setup_world() -> void:
 
 	_coin_manager.coin_collected.connect(_on_coin_collected)
 	_enemy_manager.enemy_destroyed.connect(_coin_manager._on_enemy_destroyed)
+	_enemy_manager.enemy_destroyed.connect(_on_enemy_destroyed)
 	_player.ability_controller.cooldown_changed.connect(hud.set_fire_cooldown)
+	_player.ability_controller.cooldown_changed.connect(_on_fire_cooldown_changed)
 	_player.configure_abilities(
 		profile_store.is_double_jump_unlocked(),
 		profile_store.is_glide_unlocked(),
@@ -332,6 +341,7 @@ func _on_score_changed(new_score: int) -> void:
 
 
 func _on_game_over(final_score: int) -> void:
+	audio_manager.play_sfx(&"sfx_death")
 	get_tree().paused = false
 	if is_instance_valid(_player):
 		_player.stop_movement()
@@ -351,7 +361,17 @@ func _on_game_over(final_score: int) -> void:
 
 
 func _on_coin_collected() -> void:
+	audio_manager.play_sfx(&"sfx_coin")
 	run_session.add_run_coin()
+
+
+func _on_enemy_destroyed(_enemy_position: Vector2) -> void:
+	audio_manager.play_sfx(&"sfx_enemy_destroyed")
+
+
+func _on_fire_cooldown_changed(is_on_cooldown: bool) -> void:
+	if is_on_cooldown:
+		audio_manager.play_sfx(&"sfx_fire")
 
 
 func _on_fire_requested() -> void:

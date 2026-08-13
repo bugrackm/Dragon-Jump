@@ -14,6 +14,7 @@ signal purchase_made
 @onready var back_button: Button = $CenterContainer/VBoxContainer/BackButton
 
 var _profile_store: Node
+var _audio_manager: Node
 
 
 func _ready() -> void:
@@ -21,6 +22,10 @@ func _ready() -> void:
 	glide_button.pressed.connect(_on_glide_pressed)
 	fire_button.pressed.connect(_on_fire_upgrade_pressed)
 	back_button.pressed.connect(_on_back_pressed)
+
+
+func set_audio_manager(audio_manager: Node) -> void:
+	_audio_manager = audio_manager
 
 
 func open(profile_store: Node) -> void:
@@ -63,33 +68,40 @@ func refresh() -> void:
 
 
 func _on_double_jump_pressed() -> void:
+	_play_sfx(&"sfx_ui_click")
 	if (
 		is_instance_valid(_profile_store)
 		and bool(_profile_store.call("unlock_double_jump"))
 	):
 		refresh()
+		_play_sfx(&"sfx_purchase")
 		purchase_made.emit()
 
 
 func _on_glide_pressed() -> void:
+	_play_sfx(&"sfx_ui_click")
 	if (
 		is_instance_valid(_profile_store)
 		and bool(_profile_store.call("unlock_glide"))
 	):
 		refresh()
+		_play_sfx(&"sfx_purchase")
 		purchase_made.emit()
 
 
 func _on_fire_upgrade_pressed() -> void:
+	_play_sfx(&"sfx_ui_click")
 	if (
 		is_instance_valid(_profile_store)
 		and bool(_profile_store.call("upgrade_fire_breath"))
 	):
 		refresh()
+		_play_sfx(&"sfx_purchase")
 		purchase_made.emit()
 
 
 func _on_back_pressed() -> void:
+	_play_sfx(&"sfx_ui_back")
 	back_requested.emit()
 
 
@@ -99,3 +111,8 @@ func grab_focus_on_first_button() -> void:
 			button.grab_focus()
 			return
 	back_button.grab_focus()
+
+
+func _play_sfx(sound_name: StringName) -> void:
+	if is_instance_valid(_audio_manager):
+		_audio_manager.call("play_sfx", sound_name)
