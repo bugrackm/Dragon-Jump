@@ -1,8 +1,9 @@
 # Prompts
 Prompts.txt
 
-# AI context documents (local only, not for GitHub)
+# AI context documents and tooling config (local only, not for GitHub)
 CLAUDE.md
+.claude/
 docs/ai/
 docs/codex-briefs/
 
