@@ -2,11 +2,15 @@
 Prompts.txt
 
 # AI context documents (local only, not for GitHub)
+CLAUDE.md
 docs/ai/
 docs/codex-briefs/
 
 # Hermes operations (logs, reports — not durable docs)
 .hermes-ops/
+
+# Agent run logs (Codex transcripts, stderr — regenerated, not durable docs)
+logs/
 
 # Environment
 .env
