@@ -6,10 +6,13 @@ const GRAVITY := 2400.0
 const JUMP_VELOCITY := -1150.0
 const MOVE_SPEED := 520.0
 const DOUBLE_JUMP_COOLDOWN := 1.0
+const JUMP_DUST_SCENE := preload("res://scenes/effects/JumpDust.tscn")
+const FLAP_PUFF_SCENE := preload("res://scenes/effects/FlapPuff.tscn")
 
 @onready var input_controller := $InputController
 @onready var ability_controller := $AbilityController
 @onready var animation_controller := $AnimationController
+@onready var glide_trail: CPUParticles2D = $GlideTrail
 
 var active := false
 var double_jump_enabled := false
@@ -77,6 +80,7 @@ func _physics_process(delta: float) -> void:
 
 	_wrap_around_screen()
 	if double_jump_just_triggered:
+		_spawn_flap_puff()
 		animation_controller.call("trigger_double_jump")
 		_play_sfx(&"sfx_double_jump")
 	var animation_is_gliding := (
@@ -85,6 +89,7 @@ func _physics_process(delta: float) -> void:
 		and not is_on_floor()
 		and velocity.y > 0.0
 	)
+	glide_trail.emitting = animation_is_gliding
 	_set_glide_sound_active(animation_is_gliding)
 	animation_controller.call("update_animation", animation_is_gliding)
 
@@ -107,6 +112,7 @@ func start_movement() -> void:
 
 func stop_movement() -> void:
 	active = false
+	glide_trail.emitting = false
 	_set_glide_sound_active(false)
 	input_controller.call("set_active", false)
 	ability_controller.call("set_active", false)
@@ -134,6 +140,7 @@ func _apply_platform_landing() -> void:
 	for collision_index in get_slide_collision_count():
 		var collision := get_slide_collision(collision_index)
 		if collision.get_normal().y < -0.5:
+			_spawn_jump_dust(collision.get_position())
 			var platform := collision.get_collider()
 			if platform and platform.has_method("on_player_landed"):
 				platform.call("on_player_landed", self)
@@ -143,6 +150,28 @@ func _apply_platform_landing() -> void:
 	# the original M1 automatic jump unchanged.
 	if velocity.y >= 0.0:
 		velocity.y = JUMP_VELOCITY
+
+
+func _spawn_jump_dust(world_position: Vector2) -> void:
+	var effect_parent := get_parent()
+	if effect_parent == null:
+		return
+	var dust := JUMP_DUST_SCENE.instantiate() as CPUParticles2D
+	effect_parent.add_child(dust)
+	dust.global_position = world_position
+	dust.finished.connect(dust.queue_free)
+	dust.emitting = true
+
+
+func _spawn_flap_puff() -> void:
+	var effect_parent := get_parent()
+	if effect_parent == null:
+		return
+	var puff := FLAP_PUFF_SCENE.instantiate() as CPUParticles2D
+	effect_parent.add_child(puff)
+	puff.global_position = global_position + Vector2(0.0, 30.0)
+	puff.finished.connect(puff.queue_free)
+	puff.emitting = true
 
 
 func _wrap_around_screen() -> void:

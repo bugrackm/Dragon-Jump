@@ -342,6 +342,8 @@ func _on_score_changed(new_score: int) -> void:
 
 func _on_game_over(final_score: int) -> void:
 	audio_manager.play_sfx(&"sfx_death")
+	if is_instance_valid(_camera):
+		_camera.call("start_shake")
 	get_tree().paused = false
 	if is_instance_valid(_player):
 		_player.stop_movement()

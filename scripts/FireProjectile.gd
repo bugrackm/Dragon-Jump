@@ -5,6 +5,7 @@ extends Area2D
 const SPEED := 800.0
 const TTL_SECONDS := 3.0
 const CAMERA_TOP_MARGIN := 200.0
+const FIRE_BURST_SCENE := preload("res://scenes/effects/FireBurst.tscn")
 
 var _enemy_manager: Node
 var _camera: Camera2D
@@ -20,6 +21,18 @@ func _ready() -> void:
 func initialize(enemy_manager: Node, camera: Camera2D) -> void:
 	_enemy_manager = enemy_manager
 	_camera = camera
+	_spawn_fire_burst()
+
+
+func _spawn_fire_burst() -> void:
+	var effect_parent := get_parent()
+	if effect_parent == null:
+		return
+	var burst := FIRE_BURST_SCENE.instantiate() as CPUParticles2D
+	effect_parent.add_child(burst)
+	burst.global_position = global_position
+	burst.finished.connect(burst.queue_free)
+	burst.emitting = true
 
 
 func _physics_process(delta: float) -> void:

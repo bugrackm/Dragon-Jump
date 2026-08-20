@@ -4,6 +4,8 @@ extends Area2D
 
 signal coin_collected
 
+const COIN_SPARKLE_SCENE := preload("res://scenes/effects/CoinSparkle.tscn")
+
 var _player: CharacterBody2D
 var _active := true
 var _collected := false
@@ -29,5 +31,17 @@ func _on_body_entered(body: Node2D) -> void:
 	_collected = true
 	_active = false
 	set_deferred("monitoring", false)
+	_spawn_sparkle()
 	coin_collected.emit()
 	queue_free()
+
+
+func _spawn_sparkle() -> void:
+	var effect_parent := get_parent()
+	if effect_parent == null:
+		return
+	var sparkle := COIN_SPARKLE_SCENE.instantiate() as CPUParticles2D
+	effect_parent.add_child(sparkle)
+	sparkle.global_position = global_position
+	sparkle.finished.connect(sparkle.queue_free)
+	sparkle.emitting = true
