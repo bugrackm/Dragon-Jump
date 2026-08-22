@@ -1,0 +1,128 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer1.png" id="1_sky"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer2.png" id="2_far_landscape"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer3.png" id="3_mid_landscape"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer4.png" id="4_near_landscape"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/cloud.png" id="5_cloud"]
+
+[node name="Background" type="ParallaxBackground"]
+layer = -100
+
+[node name="Sky" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0, 0)
+
+[node name="Sprite" type="Sprite2D" parent="Sky"]
+texture_filter = 2
+position = Vector2(540, 960)
+scale = Vector2(0.9375, 0.9375)
+texture = ExtResource("1_sky")
+
+[node name="FarLandscape" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.15, 0.15)
+
+[node name="Sprite" type="Sprite2D" parent="FarLandscape"]
+texture_filter = 2
+position = Vector2(540, 960)
+scale = Vector2(0.9375, 0.9375)
+texture = ExtResource("2_far_landscape")
+
+[node name="MidLandscape" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.3, 0.3)
+
+[node name="Sprite" type="Sprite2D" parent="MidLandscape"]
+texture_filter = 2
+position = Vector2(540, 960)
+scale = Vector2(0.9375, 0.9375)
+texture = ExtResource("3_mid_landscape")
+
+[node name="NearLandscape" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.45, 0.45)
+
+[node name="Sprite" type="Sprite2D" parent="NearLandscape"]
+texture_filter = 2
+position = Vector2(540, 960)
+scale = Vector2(0.9375, 0.9375)
+texture = ExtResource("4_near_landscape")
+
+[node name="FarClouds" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.3, 0.3)
+motion_mirroring = Vector2(1080, 2160)
+
+[node name="CloudA" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.42)
+position = Vector2(120, 170)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("5_cloud")
+
+[node name="CloudB" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.36)
+position = Vector2(520, 570)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("5_cloud")
+flip_h = true
+
+[node name="CloudC" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.46)
+position = Vector2(940, 310)
+scale = Vector2(0.78, 0.78)
+texture = ExtResource("5_cloud")
+
+[node name="CloudD" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.4)
+position = Vector2(310, 890)
+scale = Vector2(0.62, 0.62)
+texture = ExtResource("5_cloud")
+flip_h = true
+
+[node name="CloudE" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.44)
+position = Vector2(820, 1210)
+scale = Vector2(0.72, 0.72)
+texture = ExtResource("5_cloud")
+
+[node name="CloudF" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.36)
+position = Vector2(150, 1570)
+scale = Vector2(0.58, 0.58)
+texture = ExtResource("5_cloud")
+
+[node name="CloudG" type="Sprite2D" parent="FarClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.45)
+position = Vector2(650, 1970)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("5_cloud")
+flip_h = true
+
+[node name="NearClouds" type="ParallaxLayer" parent="."]
+motion_scale = Vector2(0.6, 0.6)
+motion_mirroring = Vector2(1080, 2160)
+
+[node name="CloudA" type="Sprite2D" parent="NearClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.68)
+position = Vector2(250, 920)
+texture = ExtResource("5_cloud")
+flip_h = true
+
+[node name="CloudB" type="Sprite2D" parent="NearClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.62)
+position = Vector2(850, 440)
+scale = Vector2(1.15, 1.15)
+texture = ExtResource("5_cloud")
+
+[node name="CloudC" type="Sprite2D" parent="NearClouds"]
+texture_filter = 2
+modulate = Color(1, 1, 1, 0.65)
+position = Vector2(590, 1630)
+scale = Vector2(0.9, 0.9)
+texture = ExtResource("5_cloud")
+flip_h = true

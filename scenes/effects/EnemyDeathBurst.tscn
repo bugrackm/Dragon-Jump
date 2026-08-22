@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/particles/smoke.png" id="1_smoke"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particles/flame.png" id="2_flame"]
+
+[sub_resource type="Gradient" id="Gradient_smoke_fade"]
+colors = PackedColorArray(1, 1, 1, 0.5, 1, 1, 1, 0)
+
+[sub_resource type="Gradient" id="Gradient_flame_fade"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[node name="EnemyDeathBurst" type="CPUParticles2D"]
+texture_filter = 2
+emitting = false
+amount = 8
+texture = ExtResource("1_smoke")
+lifetime = 0.55
+one_shot = true
+explosiveness = 0.85
+spread = 180.0
+gravity = Vector2(0, 20)
+initial_velocity_min = 40.0
+initial_velocity_max = 90.0
+scale_amount_min = 0.25
+scale_amount_max = 0.5
+color_ramp = SubResource("Gradient_smoke_fade")
+
+[node name="Flame" type="CPUParticles2D" parent="."]
+texture_filter = 2
+emitting = false
+amount = 10
+texture = ExtResource("2_flame")
+lifetime = 0.3
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 90.0
+initial_velocity_max = 180.0
+scale_amount_min = 0.3
+scale_amount_max = 0.55
+color_ramp = SubResource("Gradient_flame_fade")

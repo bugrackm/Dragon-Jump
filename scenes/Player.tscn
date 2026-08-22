@@ -1,243 +1,92 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=20 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/InputController.gd" id="2_input"]
 [ext_resource type="Script" path="res://scripts/AbilityController.gd" id="3_ability"]
 [ext_resource type="Script" path="res://scripts/AnimationController.gd" id="4_animation_controller"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_idle_a.png" id="5_idle_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_idle_b.png" id="6_idle_b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_jump_a.png" id="7_jump_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_jump_b.png" id="8_jump_b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_fall.png" id="9_fall"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_glide_a.png" id="10_glide_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_glide_b.png" id="11_glide_b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_flap_a.png" id="12_flap_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_flap_b.png" id="13_flap_b"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_flap_c.png" id="14_flap_c"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_fire.png" id="15_fire"]
+[ext_resource type="PackedScene" path="res://scenes/effects/GlideTrail.tscn" id="16_glide_trail"]
+[ext_resource type="PackedScene" path="res://scenes/effects/MouthFlame.tscn" id="17_mouth_flame"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 34.0
 height = 88.0
 
-[sub_resource type="Animation" id="Animation_RESET"]
-resource_name = "RESET"
-length = 0.0
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-length = 0.1
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0, 0.05, 0.1), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(0.95, 0.95), Vector2(1, 1), Vector2(0.95, 0.95)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_jump"]
-resource_name = "jump"
-length = 0.15
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0, 0.075, 0.15), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(0.8, 1.2), Vector2(1.05, 0.95), Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_double_jump"]
-resource_name = "double_jump"
-length = 0.2
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0, 0.1, 0.2), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [0.0, -0.55, 0.0]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0, 0.1, 0.2), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [0.0, 0.55, 0.0]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_glide"]
-resource_name = "glide"
-length = 0.6
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0, 0.3, 0.6), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1.02, 0.98), Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [-0.35]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.35]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_fire"]
-resource_name = "fire"
-length = 0.15
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0, 0.075, 0.15), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Vector2(1, 1), Vector2(1.08, 1.08), Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0, 0.075, 0.15), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1), Color(1, 0.45, 0.08, 1), Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.0]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="Animation" id="Animation_fall"]
-resource_name = "fall"
-length = 0.6
-loop_mode = 1
-tracks/0/type = "value"
-tracks/0/path = NodePath("VisualRoot:scale")
-tracks/0/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/1/type = "value"
-tracks/1/path = NodePath("VisualRoot:rotation")
-tracks/1/keys = {"times": PackedFloat32Array(0, 0.3, 0.6), "transitions": PackedFloat32Array(1, 1, 1), "update": 0, "values": [0.08, 0.12, 0.08]}
-tracks/2/type = "value"
-tracks/2/path = NodePath("VisualRoot:modulate")
-tracks/2/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(1, 1, 1, 1)]}
-tracks/3/type = "value"
-tracks/3/path = NodePath("VisualRoot/Body:scale")
-tracks/3/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/4/type = "value"
-tracks/4/path = NodePath("VisualRoot/Body:modulate")
-tracks/4/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Color(0.38, 0.9, 0.36, 1)]}
-tracks/5/type = "value"
-tracks/5/path = NodePath("VisualRoot/LeftWing:rotation")
-tracks/5/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [-0.1]}
-tracks/6/type = "value"
-tracks/6/path = NodePath("VisualRoot/LeftWing:scale")
-tracks/6/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-tracks/7/type = "value"
-tracks/7/path = NodePath("VisualRoot/RightWing:rotation")
-tracks/7/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [0.1]}
-tracks/8/type = "value"
-tracks/8/path = NodePath("VisualRoot/RightWing:scale")
-tracks/8/keys = {"times": PackedFloat32Array(0), "transitions": PackedFloat32Array(1), "update": 0, "values": [Vector2(1, 1)]}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_player"]
-_data = {
-&"RESET": SubResource("Animation_RESET"),
-&"double_jump": SubResource("Animation_double_jump"),
-&"fall": SubResource("Animation_fall"),
-&"fire": SubResource("Animation_fire"),
-&"glide": SubResource("Animation_glide"),
-&"idle": SubResource("Animation_idle"),
-&"jump": SubResource("Animation_jump")
-}
+[sub_resource type="SpriteFrames" id="SpriteFrames_player"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_idle_a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_idle_b")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_jump_a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_jump_b")
+}],
+"loop": true,
+"name": &"jump",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_fall")
+}],
+"loop": true,
+"name": &"fall",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_glide_a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_glide_b")
+}],
+"loop": true,
+"name": &"glide",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_flap_a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_flap_b")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_flap_c")
+}],
+"loop": false,
+"name": &"double_jump",
+"speed": 15.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_fire")
+}],
+"loop": false,
+"name": &"fire",
+"speed": 6.666667
+}]
 
 [node name="Player" type="CharacterBody2D"]
 collision_layer = 1
@@ -254,23 +103,20 @@ script = ExtResource("2_input")
 [node name="AbilityController" type="Node" parent="."]
 script = ExtResource("3_ability")
 
+[node name="GlideTrail" parent="." instance=ExtResource("16_glide_trail")]
+position = Vector2(0, 36)
+z_index = -1
+
+[node name="MouthFlame" parent="." instance=ExtResource("17_mouth_flame")]
+position = Vector2(0, -46)
+z_index = 1
+
 [node name="VisualRoot" type="Node2D" parent="."]
 
-[node name="Body" type="Polygon2D" parent="VisualRoot"]
-polygon = PackedVector2Array(-30, -40, 30, -40, 38, 20, 18, 42, -18, 42, -38, 20)
-color = Color(1, 1, 1, 1)
-modulate = Color(0.38, 0.9, 0.36, 1)
-
-[node name="LeftWing" type="Polygon2D" parent="VisualRoot"]
-polygon = PackedVector2Array(-22, -8, -68, 6, -30, 22)
-color = Color(0.22, 0.7, 0.26, 1)
-
-[node name="RightWing" type="Polygon2D" parent="VisualRoot"]
-polygon = PackedVector2Array(22, -8, 68, 6, 30, 22)
-color = Color(0.22, 0.7, 0.26, 1)
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {&"": SubResource("AnimationLibrary_player")}
+[node name="Sprite" type="AnimatedSprite2D" parent="VisualRoot"]
+texture_filter = 2
+sprite_frames = SubResource("SpriteFrames_player")
+animation = &"idle"
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("4_animation_controller")

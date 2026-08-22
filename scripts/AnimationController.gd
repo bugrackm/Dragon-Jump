@@ -1,9 +1,9 @@
 extends Node
 
-## Selects placeholder dragon animations without affecting Player physics.
+## Selects dragon sprite animations without affecting Player physics.
 
 @onready var _player := get_parent() as CharacterBody2D
-@onready var _animation_player := get_node("../AnimationPlayer") as AnimationPlayer
+@onready var _sprite := get_node("../VisualRoot/Sprite") as AnimatedSprite2D
 
 var _one_shot_override: StringName = &""
 var _current_locomotion: StringName = &""
@@ -13,7 +13,7 @@ var _last_is_gliding := false
 
 
 func _ready() -> void:
-	_animation_player.animation_finished.connect(_on_animation_finished)
+	_sprite.animation_finished.connect(_on_animation_finished)
 
 
 func trigger_fire() -> void:
@@ -26,6 +26,10 @@ func trigger_double_jump() -> void:
 
 func update_animation(is_gliding: bool) -> void:
 	_last_is_gliding = is_gliding
+	if _player.velocity.x < 0.0:
+		_sprite.flip_h = true
+	elif _player.velocity.x > 0.0:
+		_sprite.flip_h = false
 
 	# Fire has the highest priority and may replace an active double-jump shot.
 	if _fire_just_triggered:
@@ -48,7 +52,7 @@ func update_animation(is_gliding: bool) -> void:
 
 
 func stop() -> void:
-	_animation_player.stop()
+	_sprite.stop()
 	_one_shot_override = &""
 	_current_locomotion = &""
 	_fire_just_triggered = false
@@ -58,7 +62,7 @@ func stop() -> void:
 
 func _play_one_shot(animation_name: StringName) -> void:
 	_one_shot_override = animation_name
-	_animation_player.play(animation_name, 0.0)
+	_sprite.play(animation_name)
 
 
 func _select_locomotion() -> void:
@@ -75,11 +79,11 @@ func _select_locomotion() -> void:
 	if target_locomotion == _current_locomotion:
 		return
 	_current_locomotion = target_locomotion
-	_animation_player.play(target_locomotion, 0.0)
+	_sprite.play(target_locomotion)
 
 
-func _on_animation_finished(animation_name: StringName) -> void:
-	if animation_name != _one_shot_override:
+func _on_animation_finished() -> void:
+	if _sprite.animation != _one_shot_override:
 		return
 	_one_shot_override = &""
 	_select_locomotion()

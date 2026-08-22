@@ -1,9 +1,25 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/enemies/StaticMonster.gd" id="1_monster"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/monster_idle_a.png" id="2_idle_a"]
+[ext_resource type="Texture2D" path="res://assets/sprites/enemies/monster_idle_b.png" id="3_idle_b"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_monster"]
 radius = 30.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_monster"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_idle_a")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_idle_b")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}]
 
 [node name="StaticMonster" type="Area2D"]
 collision_layer = 4
@@ -11,22 +27,13 @@ collision_mask = 1
 monitoring = true
 script = ExtResource("1_monster")
 
-[node name="Body" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(0, -30, 15, -26, 26, -15, 30, 0, 26, 16, 15, 27, 0, 30, -16, 27, -27, 16, -30, 0, -26, -15, -15, -26)
-color = Color(0.5, 0.2, 0.15, 1)
-
-[node name="LeftEye" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(-15, -9, -5, -9, -5, 1, -15, 1)
-color = Color(1, 0.82, 0.2, 1)
-
-[node name="RightEye" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(5, -9, 15, -9, 15, 1, 5, 1)
-color = Color(1, 0.82, 0.2, 1)
-
-[node name="Mouth" type="Line2D" parent="."]
-points = PackedVector2Array(-12, 13, 0, 8, 12, 13)
-width = 4.0
-default_color = Color(0.23, 0.06, 0.04, 1)
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 2
+position = Vector2(0, 7.5)
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_monster")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_monster")
