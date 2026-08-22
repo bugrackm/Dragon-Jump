@@ -13,6 +13,7 @@ const FLAP_PUFF_SCENE := preload("res://scenes/effects/FlapPuff.tscn")
 @onready var ability_controller := $AbilityController
 @onready var animation_controller := $AnimationController
 @onready var glide_trail: CPUParticles2D = $GlideTrail
+@onready var mouth_flame: CPUParticles2D = $MouthFlame
 
 var active := false
 var double_jump_enabled := false
@@ -90,6 +91,13 @@ func _physics_process(delta: float) -> void:
 		and velocity.y > 0.0
 	)
 	glide_trail.emitting = animation_is_gliding
+	if glide_trail.emitting:
+		var flow := velocity
+		if flow.length() > 1.0:
+			glide_trail.direction = -flow.normalized()
+			var flow_angle := rad_to_deg(flow.angle())
+			glide_trail.angle_min = flow_angle
+			glide_trail.angle_max = flow_angle
 	_set_glide_sound_active(animation_is_gliding)
 	animation_controller.call("update_animation", animation_is_gliding)
 
@@ -113,6 +121,7 @@ func start_movement() -> void:
 func stop_movement() -> void:
 	active = false
 	glide_trail.emitting = false
+	mouth_flame.emitting = false
 	_set_glide_sound_active(false)
 	input_controller.call("set_active", false)
 	ability_controller.call("set_active", false)
@@ -184,6 +193,7 @@ func _wrap_around_screen() -> void:
 func _on_fire_cooldown_changed(is_on_cooldown: bool) -> void:
 	if is_on_cooldown:
 		animation_controller.call("trigger_fire")
+		mouth_flame.restart()
 
 
 func _set_glide_sound_active(is_gliding: bool) -> void:

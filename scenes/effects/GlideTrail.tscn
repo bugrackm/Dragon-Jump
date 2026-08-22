@@ -1,28 +1,29 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/sprites/particles/smoke.png" id="1_smoke"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particles/wind_arc.png" id="1_wind_arc"]
 
 [sub_resource type="Gradient" id="Gradient_fade"]
-offsets = PackedFloat32Array(0, 0.55, 1)
-colors = PackedColorArray(1, 1, 1, 0.24, 1, 1, 1, 0.14, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0, 0.25, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 0.7, 1, 1, 1, 0)
 
 [node name="GlideTrail" type="CPUParticles2D"]
 texture_filter = 2
 emitting = false
-amount = 10
-texture = ExtResource("1_smoke")
-lifetime = 0.6
+amount = 18
+texture = ExtResource("1_wind_arc")
+lifetime = 0.4
 one_shot = false
-randomness = 0.25
+randomness = 0.4
 local_coords = false
 direction = Vector2(0, 1)
-spread = 35.0
-initial_velocity_min = 25.0
-initial_velocity_max = 60.0
-angular_velocity_min = -45.0
-angular_velocity_max = 45.0
-scale_amount_min = 0.1
-scale_amount_max = 0.28
+spread = 6.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 220.0
+initial_velocity_max = 380.0
+angular_velocity_min = 0.0
+angular_velocity_max = 0.0
+scale_amount_min = 0.55
+scale_amount_max = 1.05
 color_ramp = SubResource("Gradient_fade")
 emission_shape = 3
-emission_rect_extents = Vector2(24, 4)
+emission_rect_extents = Vector2(26, 18)

@@ -6,6 +6,7 @@ const SPEED := 800.0
 const TTL_SECONDS := 3.0
 const CAMERA_TOP_MARGIN := 200.0
 const FIRE_BURST_SCENE := preload("res://scenes/effects/FireBurst.tscn")
+const ENEMY_DEATH_BURST_SCENE := preload("res://scenes/effects/EnemyDeathBurst.tscn")
 
 var _enemy_manager: Node
 var _camera: Camera2D
@@ -62,6 +63,13 @@ func _on_area_entered(other_area: Area2D) -> void:
 		return
 
 	_destroyed = true
+	var death_burst := ENEMY_DEATH_BURST_SCENE.instantiate() as CPUParticles2D
+	get_parent().add_child(death_burst)
+	death_burst.global_position = other_area.global_position
+	death_burst.finished.connect(death_burst.queue_free)
+	death_burst.emitting = true
+	var flame := death_burst.get_node("Flame") as CPUParticles2D
+	flame.emitting = true
 	_enemy_manager.call("destroy_enemy", other_area)
 	queue_free()
 
