@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/platforms/platform_normal.png" id="1_platform"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(1480, 600)
+
+[node name="Ground" type="StaticBody2D"]
+position = Vector2(540, 1722)
+collision_layer = 2
+collision_mask = 1
+
+[node name="Earth" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(-740, 0, 740, 0, 740, 600, -740, 600)
+color = Color(0.19, 0.105, 0.065, 1)
+
+[node name="TopStrip" type="Sprite2D" parent="."]
+texture_filter = 2
+texture_repeat = 2
+position = Vector2(-740, 0)
+scale = Vector2(0.631579, 0.631579)
+texture = ExtResource("1_platform")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 2343.333, 96)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 300)
+shape = SubResource("RectangleShape2D_ground")
+one_way_collision = false

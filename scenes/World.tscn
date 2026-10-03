@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/Background.tscn" id="1_background"]
 [ext_resource type="Script" path="res://scripts/PlatformManager.gd" id="1_manager"]
@@ -14,10 +14,14 @@
 [ext_resource type="Script" path="res://scripts/CoinManager.gd" id="11_coin_manager"]
 [ext_resource type="PackedScene" path="res://scenes/Coin.tscn" id="12_coin"]
 [ext_resource type="Script" path="res://scripts/ScreenShake.gd" id="13_screen_shake"]
+[ext_resource type="PackedScene" path="res://scenes/Ground.tscn" id="14_ground"]
+[ext_resource type="PackedScene" path="res://scenes/hazards/RisingFire.tscn" id="15_fire"]
 
 [node name="World" type="Node2D"]
 
 [node name="Background" parent="." instance=ExtResource("1_background")]
+
+[node name="Ground" parent="." instance=ExtResource("14_ground")]
 
 [node name="PlatformManager" type="Node2D" parent="."]
 script = ExtResource("1_manager")
@@ -43,3 +47,5 @@ position = Vector2(540, 1678)
 position = Vector2(540, 960)
 position_smoothing_enabled = false
 script = ExtResource("13_screen_shake")
+
+[node name="RisingFire" parent="." instance=ExtResource("15_fire")]
