@@ -61,12 +61,12 @@ func initialize(
 	_highest_platform_position = start_platform_position
 	_highest_platform_travel_half_width = 0.0
 	_last_platform_type = PLATFORM_TYPE_STATIC
-	_spawned_count = 0
+	# The ground takes the old start platform's place in safe-region indexing.
+	_spawned_count = 1
 	_difficulty_factor = 0.0
 	_moving_speed_min = MOVING_SPEED_MIN
 	_moving_speed_max = MOVING_SPEED_MAX
 
-	_spawn_platform(start_platform_position, PLATFORM_TYPE_STATIC)
 	_fill_above_camera()
 	_initialized = true
 
@@ -103,13 +103,6 @@ func _spawn_next_platform() -> void:
 	else:
 		gap_min_factor = lerpf(0.62, 0.70, _difficulty_factor)
 		gap_max_factor = lerpf(1.0, 1.1, _difficulty_factor)
-	# Non-static platforms (breakable, disappearing) are hazards the player
-	# can fall through. Reduce the vertical gap after them so the next static
-	# platform is always comfortably within reach even if the player drops.
-	if _last_platform_type in [PLATFORM_TYPE_BREAKABLE, PLATFORM_TYPE_DISAPPEARING]:
-		gap_max_factor = 0.65
-		if not safe_region:
-			gap_min_factor = minf(gap_min_factor, 0.64)
 	var vertical_gap := _rng.randf_range(
 		max_vertical_gap * gap_min_factor,
 		max_vertical_gap * gap_max_factor
@@ -129,7 +122,9 @@ func _spawn_next_platform() -> void:
 		physical_horizontal_reach * safety_factor
 	)
 
-	var platform_type := _select_platform_type()
+	var selected_type := _select_platform_type()
+	var hazard_extra := selected_type in [PLATFORM_TYPE_BREAKABLE, PLATFORM_TYPE_DISAPPEARING]
+	var platform_type := PLATFORM_TYPE_STATIC if hazard_extra else selected_type
 	var moving_range := 0.0
 	var moving_speed := 0.0
 	var next_travel_half_width := 0.0
@@ -160,9 +155,53 @@ func _spawn_next_platform() -> void:
 	var next_position := Vector2(next_x, _highest_platform_position.y - vertical_gap)
 
 	_spawn_platform(next_position, platform_type, moving_range, moving_speed)
+	if hazard_extra:
+		_spawn_hazard_extra(selected_type, next_position, next_travel_half_width)
 	_highest_platform_position = next_position
 	_highest_platform_travel_half_width = next_travel_half_width
 	_last_platform_type = platform_type
+
+
+func _spawn_hazard_extra(platform_type: StringName, next_position: Vector2,
+		next_travel_half_width: float) -> void:
+	var previous := _highest_platform_position
+	var extra_y := (previous.y + next_position.y) * 0.5
+	var rise := previous.y - extra_y
+	if rise < 30.0:
+		return
+	var discriminant := maxf(0.0, _jump_velocity * _jump_velocity - 2.0 * _gravity * rise)
+	var landing_time := (absf(_jump_velocity) + sqrt(discriminant)) / _gravity
+	var reach := minf(SCREEN_WIDTH * 0.7, _move_speed * landing_time * 0.75)
+	var center_limit := reach - _highest_platform_travel_half_width
+	var min_x := maxf(MIN_PLATFORM_CENTER_X, previous.x - center_limit)
+	var max_x := minf(MAX_PLATFORM_CENTER_X, previous.x + center_limit)
+	var intervals: Array[Vector2] = [Vector2(min_x, max_x)]
+	# Subtract both neighbors' occupied horizontal envelopes from reachable x.
+	# A small clearance protects the boundary when positions round to float32.
+	var clearance := 2.0 * PLATFORM_HALF_WIDTH + 20.0 + 0.01
+	for neighbor in [Vector2(previous.x, clearance + _highest_platform_travel_half_width),
+			Vector2(next_position.x, clearance + next_travel_half_width)]:
+		var remaining: Array[Vector2] = []
+		for interval in intervals:
+			var left_end := minf(interval.y, neighbor.x - neighbor.y)
+			var right_start := maxf(interval.x, neighbor.x + neighbor.y)
+			if left_end > interval.x:
+				remaining.append(Vector2(interval.x, left_end))
+			if right_start < interval.y:
+				remaining.append(Vector2(right_start, interval.y))
+		intervals = remaining
+	var available_width := 0.0
+	for interval in intervals:
+		available_width += interval.y - interval.x
+	if available_width <= 0.0:
+		return
+	var offset := _rng.randf_range(0.0, available_width)
+	for interval in intervals:
+		var width := interval.y - interval.x
+		if offset <= width:
+			_spawn_platform(Vector2(interval.x + offset, extra_y), platform_type)
+			return
+		offset -= width
 
 
 func _select_platform_type() -> StringName:
@@ -204,7 +243,9 @@ func _spawn_platform(
 		platform.set("travel_speed", moving_speed)
 	add_child(platform)
 	_platforms.append(platform)
-	_spawned_count += 1
+	# Extras share their chain step's index and never advance the safe region.
+	if platform_type not in [PLATFORM_TYPE_BREAKABLE, PLATFORM_TYPE_DISAPPEARING]:
+		_spawned_count += 1
 	emit_signal("platform_spawned", platform, _spawned_count, platform_type, spawn_position, moving_range * 0.5)
 
 

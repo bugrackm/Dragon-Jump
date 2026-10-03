@@ -29,6 +29,7 @@ var _coin_manager
 var _enemy_manager
 var _player
 var _camera: Camera2D
+var _rising_fire
 
 var _highest_camera_y := 960.0
 var _last_difficulty_factor := -1.0
@@ -96,19 +97,12 @@ func _physics_process(_delta: float) -> void:
 		_platform_manager.update_difficulty(difficulty_factor)
 		_enemy_manager.update_difficulty(difficulty_factor)
 		_coin_manager.update_difficulty(difficulty_factor)
+		_rising_fire.set_difficulty(difficulty_factor)
 		_last_difficulty_factor = difficulty_factor
 	_follow_player_upward()
 	_platform_manager.update_for_camera(_camera.position.y)
 	_enemy_manager.update_for_camera(_camera.position.y)
 	_coin_manager.update_for_camera(_camera.position.y)
-
-	var camera_bottom := _camera.position.y + get_viewport_rect().size.y * 0.5
-	# Tighter death line: 35% of screen below camera center.
-	# This prevents the player from getting stuck on a low platform after
-	# falling through a breakable/disappearing platform.
-	var death_line := camera_bottom + get_viewport_rect().size.y * 0.35
-	if _player.global_position.y > death_line:
-		run_session.end_run()
 
 
 func _create_persistent_overlays() -> void:
@@ -191,6 +185,10 @@ func _setup_world() -> void:
 	_enemy_manager = _current_world.get_node("EnemyManager")
 	_player = _current_world.get_node("Player")
 	_camera = _current_world.get_node("Camera2D") as Camera2D
+	_rising_fire = _current_world.get_node("RisingFire")
+	_rising_fire.player_burned.connect(run_session.end_run)
+	var jump_height: float = _player.JUMP_VELOCITY * _player.JUMP_VELOCITY / (2.0 * _player.GRAVITY)
+	_rising_fire.setup(_camera, _player, 1722.0, jump_height)
 
 	_coin_manager.coin_collected.connect(_on_coin_collected)
 	_enemy_manager.enemy_destroyed.connect(_coin_manager._on_enemy_destroyed)
@@ -327,6 +325,7 @@ func _free_current_world() -> void:
 	_enemy_manager = null
 	_player = null
 	_camera = null
+	_rising_fire = null
 
 
 func _follow_player_upward() -> void:
@@ -347,6 +346,8 @@ func _on_game_over(final_score: int) -> void:
 	get_tree().paused = false
 	if is_instance_valid(_player):
 		_player.stop_movement()
+	if is_instance_valid(_rising_fire):
+		_rising_fire.stop()
 	if is_instance_valid(_enemy_manager):
 		_enemy_manager.set_active(false)
 	if is_instance_valid(_coin_manager):
