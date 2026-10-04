@@ -25,6 +25,7 @@ var _active := false
 var _touch_state: TouchState = TouchState.IDLE
 var _primary_touch_index := -1
 var _touch_direction := 0.0
+var _held_touches := {}  # touch index -> side direction, in press order
 var _state_elapsed := 0.0
 var _tilt_output := 0.0
 var _double_jump_requested := false
@@ -49,6 +50,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventScreenTouch:
 		_handle_screen_touch(event as InputEventScreenTouch)
+	elif event is InputEventScreenDrag:
+		_handle_screen_drag(event as InputEventScreenDrag)
 	elif event is InputEventKey:
 		_handle_key(event as InputEventKey)
 
@@ -72,6 +75,7 @@ func set_active(is_active: bool) -> void:
 
 	_touch_state = TouchState.IDLE
 	_primary_touch_index = -1
+	_held_touches.clear()
 	_touch_direction = 0.0
 	_state_elapsed = 0.0
 	_tilt_output = 0.0
@@ -104,14 +108,43 @@ func _handle_screen_touch(touch: InputEventScreenTouch) -> void:
 		elif _touch_state == TouchState.FIRST_TAP_WINDOW:
 			_begin_touch(touch, TouchState.SECOND_DOWN)
 		else:
-			return
-	elif touch.index == _primary_touch_index:
-		_release_primary_touch()
+			# Overlapping press: the last pressed finger wins.
+			_begin_touch(touch, _overlap_state())
+	elif _held_touches.has(touch.index):
+		_held_touches.erase(touch.index)
+		if touch.index == _primary_touch_index:
+			if _held_touches.is_empty():
+				_release_primary_touch()
+			else:
+				# Fall back to the most recently pressed finger still down.
+				_primary_touch_index = _held_touches.keys().back()
+				_touch_direction = _held_touches[_primary_touch_index]
+				_touch_state = _overlap_state()
+				_state_elapsed = 0.0
 	else:
 		return
 
 	_refresh_outputs()
 	get_viewport().set_input_as_handled()
+
+
+func _handle_screen_drag(drag: InputEventScreenDrag) -> void:
+	if not _held_touches.has(drag.index):
+		return
+
+	var direction := _side_direction(drag.position.x)
+	_held_touches[drag.index] = direction
+	if drag.index == _primary_touch_index:
+		_touch_direction = direction
+	_refresh_outputs()
+
+
+func _overlap_state() -> TouchState:
+	return TouchState.GLIDING if _touch_state == TouchState.GLIDING else TouchState.HOLDING
+
+
+func _side_direction(x: float) -> float:
+	return -1.0 if x < ScreenLayout.GAME_WIDTH * 0.5 else 1.0
 
 
 func _handle_key(key_event: InputEventKey) -> void:
@@ -144,7 +177,9 @@ func _handle_key(key_event: InputEventKey) -> void:
 
 func _begin_touch(touch: InputEventScreenTouch, next_state: TouchState) -> void:
 	_primary_touch_index = touch.index
-	_touch_direction = -1.0 if touch.position.x < ScreenLayout.GAME_WIDTH * 0.5 else 1.0
+	_touch_direction = _side_direction(touch.position.x)
+	_held_touches.erase(touch.index)
+	_held_touches[touch.index] = _touch_direction
 	_touch_state = next_state
 	_state_elapsed = 0.0
 
@@ -197,7 +232,13 @@ func _update_tilt() -> void:
 
 
 func _refresh_outputs() -> void:
-	var touch_output := 0.0 if _touch_state == TouchState.IDLE else _touch_direction
+	var finger_down := (
+		_touch_state == TouchState.FIRST_DOWN
+		or _touch_state == TouchState.HOLDING
+		or _touch_state == TouchState.SECOND_DOWN
+		or _touch_state == TouchState.GLIDING
+	)
+	var touch_output := _touch_direction if finger_down else 0.0
 	horizontal_direction = clampf(touch_output + _tilt_output, -1.0, 1.0)
 	glide_active = (
 		_touch_state == TouchState.GLIDING
@@ -208,5 +249,6 @@ func _refresh_outputs() -> void:
 func _reset_touch() -> void:
 	_touch_state = TouchState.IDLE
 	_primary_touch_index = -1
+	_held_touches.clear()
 	_touch_direction = 0.0
 	_state_elapsed = 0.0

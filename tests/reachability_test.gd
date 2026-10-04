@@ -218,7 +218,7 @@ func _check_world_and_fire() -> void:
 	_expect(initial_layout[0][0].y < ANCHOR.y, "no start platform")
 	for index in range(9):
 		_expect(initial_layout[index][1] == &"static", "safe platform %d" % index)
-	_expect(fire.speed_model == 0 and fire.rise_speed_min == 90.0 and fire.rise_speed_max == 170.0
+	_expect(fire.speed_model == 2 and fire.visible_band == 70.0 and fire.rise_speed_min == 90.0 and fire.rise_speed_max == 170.0
 		and fire.leash_below_screen == 40.0 and fire.kill_inset == 24.0 and fire.activation_margin == 40.0, "fire export defaults")
 	var jump_height: float = PLAYER_SCRIPT.JUMP_VELOCITY * PLAYER_SCRIPT.JUMP_VELOCITY / (2.0 * PLAYER_SCRIPT.GRAVITY)
 	var inactive_y: float = fire.fire_top_y
@@ -239,7 +239,23 @@ func _check_world_and_fire() -> void:
 	_expect(is_equal_approx(fire.fire_top_y, leash_y - 90.0), "minimum rise speed")
 	fire.set_difficulty(1.0)
 	fire._physics_process(1.0)
-	_expect(is_equal_approx(fire.fire_top_y, leash_y - 260.0), "maximum rise speed")
+	_expect(is_equal_approx(fire.fire_top_y, leash_y - 110.0), "maximum rise speed clamps at visible band")
+	fire.fire_top_y = leash_y + 500.0
+	fire._physics_process(0.0)
+	_expect(fire.fire_top_y == leash_y, "screen-band leash clamps")
+	var band_y: float = _screen_layout.visible_bottom(camera.position.y) - fire.visible_band
+	fire.fire_top_y = band_y + 5.0
+	fire._physics_process(1.0)
+	_expect(fire.fire_top_y == band_y, "screen-band pins fire to visible band")
+	for model in [2, 0]:
+		fire.speed_model = model
+		for pair in [[0.0, 90.0], [1.0, 170.0]]:
+			fire.set_difficulty(pair[0])
+			fire.fire_top_y = leash_y
+			fire._physics_process(0.5)
+			_expect(is_equal_approx(leash_y - fire.fire_top_y, pair[1] * 0.5),
+				"unclamped rise rate %.0f px/s model %d" % [pair[1], model])
+	fire.speed_model = 0
 	fire.fire_top_y = leash_y + 500.0
 	fire._physics_process(0.0)
 	_expect(fire.fire_top_y == leash_y, "rubber-band leash clamps")
