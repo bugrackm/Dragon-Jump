@@ -11,7 +11,7 @@ signal platform_spawned(platform: Node2D, spawn_index: int, platform_type: Strin
 @export var spring_platform_scene: PackedScene
 
 const SCREEN_WIDTH := 1080.0
-const SCREEN_HEIGHT := 1920.0
+const LAYOUT := preload("res://scripts/ScreenLayout.gd")
 const PLATFORM_HALF_WIDTH := 120.0
 const MIN_PLATFORM_CENTER_X := PLATFORM_HALF_WIDTH
 const MAX_PLATFORM_CENTER_X := SCREEN_WIDTH - PLATFORM_HALF_WIDTH
@@ -30,6 +30,7 @@ const PLATFORM_TYPE_DISAPPEARING := &"disappearing"
 const PLATFORM_TYPE_SPRING := &"spring"
 
 var _rng: RandomNumberGenerator
+@onready var _screen_layout: LAYOUT = get_node("/root/ScreenLayout")
 var _platforms: Array[Node2D] = []
 var _highest_platform_position := Vector2.ZERO
 var _highest_platform_travel_half_width := 0.0
@@ -39,7 +40,7 @@ var _jump_velocity := -1150.0
 var _gravity := 2400.0
 var _move_speed := 520.0
 var _jump_height := 275.0
-var _camera_y := SCREEN_HEIGHT * 0.5
+var _camera_y := 0.0
 var _initialized := false
 var _difficulty_factor := 0.0
 var _moving_speed_min := MOVING_SPEED_MIN
@@ -67,6 +68,7 @@ func initialize(
 	_moving_speed_min = MOVING_SPEED_MIN
 	_moving_speed_max = MOVING_SPEED_MAX
 
+	_camera_y = LAYOUT.BASE_HEIGHT - _screen_layout.half_height()
 	_fill_above_camera()
 	_initialized = true
 
@@ -87,7 +89,7 @@ func update_difficulty(factor: float) -> void:
 
 
 func _fill_above_camera() -> void:
-	var spawn_ceiling := _camera_y - SCREEN_HEIGHT * 0.5 - TOP_SPAWN_BUFFER
+	var spawn_ceiling := _screen_layout.visible_top(_camera_y) - TOP_SPAWN_BUFFER
 	while _highest_platform_position.y > spawn_ceiling:
 		_spawn_next_platform()
 
@@ -264,7 +266,7 @@ func _get_platform_scene(platform_type: StringName) -> PackedScene:
 
 
 func _free_platforms_below_camera() -> void:
-	var free_line := _camera_y + SCREEN_HEIGHT * 0.5 + BOTTOM_FREE_BUFFER
+	var free_line := _screen_layout.visible_bottom(_camera_y) + BOTTOM_FREE_BUFFER
 	var survivors: Array[Node2D] = []
 	for platform in _platforms:
 		if not is_instance_valid(platform):

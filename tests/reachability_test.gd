@@ -6,8 +6,10 @@ const ANCHOR := Vector2(540.0, 1740.0)
 const SEED_COUNT := 1000
 const MAX_ALTITUDE := 8000.0
 const CAMERA_STEP := 80.0
+const VISIBLE_HEIGHTS := [1920, 2340, 2400, 2520]
 const EPSILON := 0.001
 
+var _screen_layout: Node
 var _records: Array[Dictionary] = []
 var _checked := 0
 var _chain_violations := 0
@@ -38,6 +40,37 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	_screen_layout = root.get_node("ScreenLayout")
+	root.content_scale_size = Vector2i(1080, 1920)
+	root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP_WIDTH
+	var failures := 0
+	for height in VISIBLE_HEIGHTS:
+		root.size = Vector2i(1080, height)
+		await process_frame
+		_screen_layout.refresh()
+		_checked = 0
+		_chain_violations = 0
+		_stacking_violations = 0
+		_hazard_violations = 0
+		_hazards = 0
+		_hazard_steps = 0
+		_min_gap = INF
+		_max_gap = 0.0
+		_printed_example = false
+		_integration_checks = 0
+		_integration_failures = 0
+		_expect(is_equal_approx(_screen_layout.visible_size.y, height), "real visible height")
+		print("visible_height=%d" % height)
+		await _check_height()
+		_expect(_checked >= SEED_COUNT * 10 and _integration_checks >= 30, "full audit completed")
+		failures += _chain_violations + _stacking_violations + _hazard_violations + _integration_failures
+	print("heights=%d seeds_total=%d violations=%d" % [VISIBLE_HEIGHTS.size(), SEED_COUNT * VISIBLE_HEIGHTS.size(), failures])
+	quit(0 if failures == 0 else 1)
+
+
+func _check_height() -> void:
+	var initial_camera_y: float = _screen_layout.BASE_HEIGHT - _screen_layout.half_height()
 	for seed_value in range(1, SEED_COUNT + 1):
 		_records.clear()
 		var manager := AuditedManager.new()
@@ -57,7 +90,7 @@ func _run() -> void:
 		while altitude < MAX_ALTITUDE:
 			altitude += CAMERA_STEP
 			manager.update_difficulty(clampf(altitude / 5000.0, 0.0, 1.0))
-			manager.update_for_camera(960.0 - altitude)
+			manager.update_for_camera(initial_camera_y - altitude)
 		_check_chain(seed_value)
 		_hazard_steps += manager.hazard_steps
 		manager.free()
@@ -71,8 +104,6 @@ func _run() -> void:
 	_check_world_and_fire()
 	await process_frame
 	print("world_fire_checks=%d failures=%d" % [_integration_checks, _integration_failures])
-	quit(0 if _chain_violations == 0 and _stacking_violations == 0
-		and _hazard_violations == 0 and _integration_failures == 0 else 1)
 
 
 func _record_platform(_platform: Node2D, index: int, platform_type: StringName,
@@ -171,6 +202,9 @@ func _check_world_and_fire() -> void:
 	var player: Node2D = main._player
 	var fire = main._rising_fire
 	var camera: Camera2D = main._camera
+	_expect(is_equal_approx(camera.position.y, _screen_layout.BASE_HEIGHT - _screen_layout.half_height()), "initial camera uses visible height")
+	_expect(is_equal_approx(_screen_layout.visible_bottom(camera.position.y), _screen_layout.BASE_HEIGHT), "start world bottom")
+	_expect(main._platform_manager._highest_platform_position.y <= _screen_layout.visible_top(camera.position.y) - main._platform_manager.TOP_SPAWN_BUFFER, "initial spawn ceiling above view")
 	var initial_layout := _layout(main._platform_manager)
 	var ground := world.get_node("Ground") as StaticBody2D
 	var collider := ground.get_node("CollisionShape2D") as CollisionShape2D
@@ -198,7 +232,7 @@ func _check_world_and_fire() -> void:
 	_expect(fire.fire_top_y == inactive_y, "above activation threshold stays inactive")
 	player.position.y -= 1.0
 	fire._physics_process(0.0)
-	var leash_y: float = camera.position.y + 960.0 + fire.leash_below_screen
+	var leash_y: float = _screen_layout.visible_bottom(camera.position.y) + fire.leash_below_screen
 	_expect(fire.fire_top_y == leash_y and fire.visible, "activation starts at leash")
 	fire.set_difficulty(0.0)
 	fire._physics_process(1.0)

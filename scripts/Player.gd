@@ -6,6 +6,7 @@ const GRAVITY := 2400.0
 const JUMP_VELOCITY := -1150.0
 const MOVE_SPEED := 520.0
 const DOUBLE_JUMP_COOLDOWN := 1.0
+const GAME_WIDTH := preload("res://scripts/ScreenLayout.gd").GAME_WIDTH
 const JUMP_DUST_SCENE := preload("res://scenes/effects/JumpDust.tscn")
 const FLAP_PUFF_SCENE := preload("res://scenes/effects/FlapPuff.tscn")
 
@@ -18,14 +19,12 @@ const FLAP_PUFF_SCENE := preload("res://scenes/effects/FlapPuff.tscn")
 var active := false
 var double_jump_enabled := false
 var glide_enabled := false
-var _screen_width := 1080.0
 var _can_double_jump := true
 var _double_jump_cooldown_left := 0.0
 var _glide_sound_active := false
 
 
 func _ready() -> void:
-	_screen_width = get_viewport_rect().size.x
 	ability_controller.cooldown_changed.connect(_on_fire_cooldown_changed)
 
 
@@ -185,8 +184,8 @@ func _spawn_flap_puff() -> void:
 
 func _wrap_around_screen() -> void:
 	if global_position.x < 0.0:
-		global_position.x = _screen_width
-	elif global_position.x > _screen_width:
+		global_position.x = GAME_WIDTH
+	elif global_position.x > GAME_WIDTH:
 		global_position.x = 0.0
 
 

@@ -77,5 +77,5 @@ func _on_area_entered(other_area: Area2D) -> void:
 func _is_above_camera_limit() -> bool:
 	if _camera == null or not is_instance_valid(_camera):
 		return false
-	var camera_top := _camera.global_position.y - get_viewport_rect().size.y * 0.5
+	var camera_top := ScreenLayout.visible_top(_camera.position.y)
 	return global_position.y < camera_top - CAMERA_TOP_MARGIN

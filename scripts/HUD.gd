@@ -5,6 +5,8 @@ extends CanvasLayer
 signal fire_requested
 signal pause_requested
 
+const SAFE_AREA := preload("res://scripts/ui/SafeAreaMargin.gd")
+
 @onready var score_label: Label = $MarginContainer/Rows/ScoreLabel
 @onready var high_score_label: Label = $MarginContainer/Rows/HighScoreLabel
 @onready var coin_label: Label = $MarginContainer/Rows/CoinLabel
@@ -15,9 +17,16 @@ var _fire_on_cooldown := false
 
 
 func _ready() -> void:
+	ScreenLayout.layout_changed.connect(_apply_layout)
+	_apply_layout()
 	fire_button.connect("fire_requested", _on_fire_button_fire_requested)
 	pause_button.pressed.connect(_on_pause_button_pressed)
 	_update_fire_button()
+
+
+func _apply_layout() -> void:
+	SAFE_AREA.apply_safe_offsets(pause_button, Vector4(-160, 40, -40, 160), Vector4(0, 40, 40, 0))
+	SAFE_AREA.apply_safe_offsets(fire_button, Vector4(-180, -180, -40, -40), Vector4(0, 0, 40, 40))
 
 
 func set_score(value: int) -> void:

@@ -27,7 +27,7 @@ func setup(camera: Camera2D, player: Node2D, ground_top_y: float, jump_height: f
 	_camera = camera
 	_player = player
 	_activation_y = ground_top_y - (jump_height + activation_margin)
-	fire_top_y = maxf(ground_top_y + 600.0, _camera.position.y + 960.0 + leash_below_screen)
+	fire_top_y = maxf(ground_top_y + 600.0, ScreenLayout.visible_bottom(_camera.position.y) + leash_below_screen)
 	global_position.y = fire_top_y
 	_difficulty = 0.0
 	_active = false
@@ -51,7 +51,7 @@ func stop() -> void:
 func _physics_process(delta: float) -> void:
 	if _stopped or not is_instance_valid(_camera) or not is_instance_valid(_player):
 		return
-	var camera_bottom := _camera.position.y + 960.0
+	var camera_bottom := ScreenLayout.visible_bottom(_camera.position.y)
 	if not _active:
 		if _player.global_position.y >= _activation_y:
 			return

@@ -5,7 +5,6 @@ extends Node2D
 signal enemy_destroyed(enemy_position: Vector2)
 
 const SCREEN_WIDTH := 1080.0
-const SCREEN_HEIGHT := 1920.0
 const BOTTOM_FREE_BUFFER := 300.0
 const FIRST_ENEMY_PLATFORM_INDEX := 16
 const MAX_CONCURRENT_ENEMIES := 5
@@ -121,7 +120,7 @@ func update_for_camera(camera_y: float) -> void:
 
 	_prune_platform_records()
 	_prune_enemies()
-	var free_line := camera_y + SCREEN_HEIGHT * 0.5 + BOTTOM_FREE_BUFFER
+	var free_line := ScreenLayout.visible_bottom(camera_y) + BOTTOM_FREE_BUFFER
 	for enemy in _enemies:
 		if enemy.get_parent() == self and enemy.global_position.y > free_line:
 			enemy.queue_free()

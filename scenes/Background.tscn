@@ -1,4 +1,6 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/Background.gd" id="6_layout"]
 
 [ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer1.png" id="1_sky"]
 [ext_resource type="Texture2D" path="res://assets/sprites/background/bg_layer2.png" id="2_far_landscape"]
@@ -8,6 +10,7 @@
 
 [node name="Background" type="ParallaxBackground"]
 layer = -100
+script = ExtResource("6_layout")
 
 [node name="Sky" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0, 0)
@@ -47,7 +50,7 @@ texture = ExtResource("4_near_landscape")
 
 [node name="FarClouds" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0.3, 0.3)
-motion_mirroring = Vector2(1080, 2160)
+motion_mirroring = Vector2(1080, 2520)
 
 [node name="CloudA" type="Sprite2D" parent="FarClouds"]
 texture_filter = 2
@@ -103,7 +106,7 @@ flip_h = true
 
 [node name="NearClouds" type="ParallaxLayer" parent="."]
 motion_scale = Vector2(0.6, 0.6)
-motion_mirroring = Vector2(1080, 2160)
+motion_mirroring = Vector2(1080, 2520)
 
 [node name="CloudA" type="Sprite2D" parent="NearClouds"]
 texture_filter = 2
