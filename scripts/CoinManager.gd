@@ -5,7 +5,6 @@ extends Node2D
 signal coin_collected
 
 const SCREEN_WIDTH := 1080.0
-const SCREEN_HEIGHT := 1920.0
 const BOTTOM_FREE_BUFFER := 300.0
 const SAFE_PLATFORM_COUNT := 10
 const PLATFORM_COIN_CHANCE := 0.40
@@ -67,7 +66,7 @@ func update_for_camera(camera_y: float) -> void:
 	if not _active:
 		return
 
-	var free_line := camera_y + SCREEN_HEIGHT * 0.5 + BOTTOM_FREE_BUFFER
+	var free_line := ScreenLayout.visible_bottom(camera_y) + BOTTOM_FREE_BUFFER
 	var world := get_parent()
 	var survivors: Array[Area2D] = []
 	for coin in _coins:

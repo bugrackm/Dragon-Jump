@@ -22,7 +22,6 @@ var horizontal_direction := 0.0
 var glide_active := false
 
 var _active := false
-var _screen_width := 1080.0
 var _touch_state: TouchState = TouchState.IDLE
 var _primary_touch_index := -1
 var _touch_direction := 0.0
@@ -33,10 +32,6 @@ var _fire_requested := false
 var _space_is_down := false
 var _keyboard_glide_blocked := false
 var _last_space_press_msec := -KEYBOARD_DOUBLE_PRESS_MSEC
-
-
-func _ready() -> void:
-	_screen_width = get_viewport().get_visible_rect().size.x
 
 
 func _process(delta: float) -> void:
@@ -149,7 +144,7 @@ func _handle_key(key_event: InputEventKey) -> void:
 
 func _begin_touch(touch: InputEventScreenTouch, next_state: TouchState) -> void:
 	_primary_touch_index = touch.index
-	_touch_direction = -1.0 if touch.position.x < _screen_width * 0.5 else 1.0
+	_touch_direction = -1.0 if touch.position.x < ScreenLayout.GAME_WIDTH * 0.5 else 1.0
 	_touch_state = next_state
 	_state_elapsed = 0.0
 

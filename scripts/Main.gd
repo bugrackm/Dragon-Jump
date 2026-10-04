@@ -31,7 +31,7 @@ var _player
 var _camera: Camera2D
 var _rising_fire
 
-var _highest_camera_y := 960.0
+var _highest_camera_y := 0.0
 var _last_difficulty_factor := -1.0
 
 
@@ -185,6 +185,9 @@ func _setup_world() -> void:
 	_enemy_manager = _current_world.get_node("EnemyManager")
 	_player = _current_world.get_node("Player")
 	_camera = _current_world.get_node("Camera2D") as Camera2D
+	# Preserve the start-of-run world bottom at 1920 on every aspect ratio.
+	_camera.position.y = ScreenLayout.BASE_HEIGHT - ScreenLayout.half_height()
+	_highest_camera_y = _camera.position.y
 	_rising_fire = _current_world.get_node("RisingFire")
 	_rising_fire.player_burned.connect(run_session.end_run)
 	var jump_height: float = _player.JUMP_VELOCITY * _player.JUMP_VELOCITY / (2.0 * _player.GRAVITY)
@@ -202,7 +205,6 @@ func _setup_world() -> void:
 	)
 
 	_last_difficulty_factor = -1.0
-	_highest_camera_y = _camera.position.y
 	_player.initialize_abilities(_current_world, _enemy_manager, _camera)
 	var actual_seed := run_seed if run_seed != 0 else randi()
 	run_session.start_new_run(actual_seed, _player.global_position.y)

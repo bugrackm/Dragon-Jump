@@ -1,4 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="3_safe"]
 
 [ext_resource type="Script" path="res://scripts/HUD.gd" id="1_hud"]
 [ext_resource type="Script" path="res://scripts/FireButton.gd" id="2_fire_button"]
@@ -7,8 +9,9 @@
 script = ExtResource("1_hud")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
-offset_right = 1080.0
+anchor_right = 1.0
 offset_bottom = 210.0
+script = ExtResource("3_safe")
 theme_override_constants/margin_left = 42
 theme_override_constants/margin_top = 36
 theme_override_constants/margin_right = 42
@@ -70,14 +73,14 @@ script = ExtResource("2_fire_button")
 [node name="PauseButton" type="Button" parent="."]
 visible = false
 modulate = Color(1, 1, 1, 0.7)
-custom_minimum_size = Vector2(48, 48)
+custom_minimum_size = Vector2(120, 120)
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -88.0
+offset_left = -160.0
 offset_top = 40.0
 offset_right = -40.0
-offset_bottom = 88.0
+offset_bottom = 160.0
 grow_horizontal = 0
 mouse_filter = 0
 focus_mode = 0

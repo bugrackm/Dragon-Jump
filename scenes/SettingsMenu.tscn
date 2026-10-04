@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
 
 [ext_resource type="Script" path="res://scripts/SettingsMenu.gd" id="1_settings"]
 
@@ -19,6 +21,7 @@ mouse_filter = 0
 color = Color(0.05, 0.1, 0.2, 0.95)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
+script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
