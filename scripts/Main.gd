@@ -31,6 +31,10 @@ var _player
 var _camera: Camera2D
 var _rising_fire
 
+## Camera auto-scroll speeds (px/s) once the fire is active; scaled by difficulty.
+@export var auto_scroll_min := 30.0
+@export var auto_scroll_max := 120.0
+
 var _highest_camera_y := 0.0
 var _last_difficulty_factor := -1.0
 
@@ -78,7 +82,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if _current_world == null or not is_instance_valid(_current_world):
 		return
 	if run_session.state != run_session.RunState.PLAYING:
@@ -99,7 +103,7 @@ func _physics_process(_delta: float) -> void:
 		_coin_manager.update_difficulty(difficulty_factor)
 		_rising_fire.set_difficulty(difficulty_factor)
 		_last_difficulty_factor = difficulty_factor
-	_follow_player_upward()
+	_follow_player_upward(delta)
 	_platform_manager.update_for_camera(_camera.position.y)
 	_enemy_manager.update_for_camera(_camera.position.y)
 	_coin_manager.update_for_camera(_camera.position.y)
@@ -330,7 +334,11 @@ func _free_current_world() -> void:
 	_rising_fire = null
 
 
-func _follow_player_upward() -> void:
+func _follow_player_upward(delta: float) -> void:
+	if _rising_fire.is_active():
+		var scroll_speed := lerpf(auto_scroll_min, auto_scroll_max, run_session.get_difficulty_factor())
+		_highest_camera_y -= scroll_speed * delta
+		_camera.position.y = _highest_camera_y
 	if _player.global_position.y < _highest_camera_y:
 		_highest_camera_y = _player.global_position.y
 		_camera.position.y = _highest_camera_y

@@ -3,12 +3,14 @@ extends Node2D
 ## World-space pressure from below; camera position is read-only.
 signal player_burned
 
-enum SpeedModel { RUBBER_BAND, CONSTANT }
+enum SpeedModel { RUBBER_BAND, CONSTANT, SCREEN_BAND }
 
-@export var speed_model: SpeedModel = SpeedModel.RUBBER_BAND
+@export var speed_model: SpeedModel = SpeedModel.SCREEN_BAND
 @export var rise_speed_min := 90.0
 @export var rise_speed_max := 170.0
 @export var leash_below_screen := 40.0
+## SCREEN_BAND: how far the fire top sits above the screen bottom (world units).
+@export var visible_band := 70.0
 @export var kill_inset := 24.0
 @export var activation_margin := 40.0
 
@@ -41,6 +43,10 @@ func set_difficulty(factor: float) -> void:
 	_difficulty = clampf(factor, 0.0, 1.0)
 
 
+func is_active() -> bool:
+	return _active
+
+
 func stop() -> void:
 	_stopped = true
 	_active = false
@@ -61,7 +67,9 @@ func _physics_process(delta: float) -> void:
 		_flames.emitting = true
 
 	fire_top_y -= lerpf(rise_speed_min, rise_speed_max, _difficulty) * delta
-	if speed_model == SpeedModel.RUBBER_BAND:
+	if speed_model == SpeedModel.SCREEN_BAND:
+		fire_top_y = maxf(fire_top_y, camera_bottom - visible_band)
+	if speed_model != SpeedModel.CONSTANT:
 		fire_top_y = minf(fire_top_y, camera_bottom + leash_below_screen)
 	global_position.y = fire_top_y
 	if _player.global_position.y > fire_top_y + kill_inset:

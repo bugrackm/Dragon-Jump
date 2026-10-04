@@ -138,7 +138,7 @@ func _check_background(height: int) -> void:
 		_expect(background.get_node(layer_name).motion_mirroring.y >= 2520, "cloud period " + layer_name)
 	# Move the player and invoke the existing follow code; never write camera position.
 	main._player.position.y = -4000
-	main._follow_player_upward()
+	main._follow_player_upward(0.0)
 	main._camera.force_update_scroll()
 	await process_frame
 	_expect(_sprite_rect(sky).encloses(screen), "sky during climb %d" % height)

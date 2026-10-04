@@ -27,6 +27,7 @@ Thumbs.db
 
 # Android build
 *.apk
+*.idsig
 *.aab
 *.keystore
 !debug.keystore
