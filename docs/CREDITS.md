@@ -24,6 +24,13 @@ Dragon Jump. Not derived from any third-party pack.
 
 13 sound effects in `assets/audio/sfx/`.
 
+### Happy Adventure (Loop)
+- Source: https://opengameart.org/content/happy-adventure-loop
+- Author: TinyWorlds
+- License: **CC0 1.0 Universal** — attribution not required, given as a courtesy.
+
+Background music in `assets/audio/music/music_happy_adventure.ogg`. Converted from the original MP3 to OGG Vorbis.
+
 ---
 
 ## Optional courtesy credit

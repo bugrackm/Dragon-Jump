@@ -34,6 +34,7 @@ func _run() -> void:
 	_check_input()
 	await _check_fire_and_camera()
 	print("checks=%d passed=%d failed=%d" % [_checks, _checks - _failures, _failures])
+	await create_timer(0.3, true, false, true).timeout
 	quit(1 if _failures > 0 else 0)
 
 
@@ -242,4 +243,5 @@ func _check_fire_and_camera() -> void:
 	main._physics_process(1.0)
 	_expect(main.run_session.state != main.run_session.RunState.PLAYING and camera.position.y == paused_y, "no auto-scroll while paused")
 	main._resume_game()
+	main.audio_manager.get_music_player().stop()
 	main.free()
