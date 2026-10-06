@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+
 signal resume_requested
 signal settings_requested
 signal quit_to_menu_requested
@@ -8,17 +10,18 @@ var _audio_manager: Node
 
 
 func _ready() -> void:
-	$CenterContainer/VBoxContainer/ResumeButton.pressed.connect(
+	UiFx.wire_press_fx(self)
+	$CenterContainer/Card/Content/ResumeButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")
 			resume_requested.emit()
 	)
-	$CenterContainer/VBoxContainer/SettingsButton.pressed.connect(
+	$CenterContainer/Card/Content/SettingsButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")
 			settings_requested.emit()
 	)
-	$CenterContainer/VBoxContainer/QuitButton.pressed.connect(
+	$CenterContainer/Card/Content/QuitButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_back")
 			quit_to_menu_requested.emit()

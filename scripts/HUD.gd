@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+
 ## Keeps screen-space labels independent from the scrolling world camera.
 
 signal fire_requested
@@ -9,7 +11,7 @@ const SAFE_AREA := preload("res://scripts/ui/SafeAreaMargin.gd")
 
 @onready var score_label: Label = $MarginContainer/Rows/ScoreLabel
 @onready var high_score_label: Label = $MarginContainer/Rows/HighScoreLabel
-@onready var coin_label: Label = $MarginContainer/Rows/CoinLabel
+@onready var coin_label: Label = $MarginContainer/Rows/CoinRow/CoinLabel
 @onready var fire_button: Button = $FireButton
 @onready var pause_button: Button = $PauseButton
 
@@ -17,6 +19,7 @@ var _fire_on_cooldown := false
 
 
 func _ready() -> void:
+	UiFx.wire_press_fx(self)
 	ScreenLayout.layout_changed.connect(_apply_layout)
 	_apply_layout()
 	fire_button.connect("fire_requested", _on_fire_button_fire_requested)
@@ -47,10 +50,19 @@ func set_fire_cooldown(on_cooldown: bool) -> void:
 
 
 func show_playing() -> void:
+	set_stats_visible(true)
 	fire_button.visible = true
 	pause_button.visible = true
 	if is_instance_valid(fire_button):
 		_update_fire_button()
+
+
+func set_stats_visible(shown: bool) -> void:
+	$MarginContainer/Rows.visible = shown
+
+
+func bump_coins() -> void:
+	UiFx.bounce($MarginContainer/Rows/CoinRow/CoinIcon)
 
 
 func hide_gameplay_ui() -> void:

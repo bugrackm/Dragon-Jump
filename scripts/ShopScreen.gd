@@ -1,23 +1,26 @@
 extends CanvasLayer
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+
 signal back_requested
 signal purchase_made
 
-@onready var coin_label: Label = $CenterContainer/VBoxContainer/CoinLabel
-@onready var double_jump_price_label: Label = $CenterContainer/VBoxContainer/DoubleJumpRow/PriceLabel
-@onready var double_jump_button: Button = $CenterContainer/VBoxContainer/DoubleJumpRow/BuyButton
-@onready var glide_price_label: Label = $CenterContainer/VBoxContainer/GlideRow/PriceLabel
-@onready var glide_button: Button = $CenterContainer/VBoxContainer/GlideRow/BuyButton
-@onready var fire_name_label: Label = $CenterContainer/VBoxContainer/FireUpgradeRow/Label
-@onready var fire_price_label: Label = $CenterContainer/VBoxContainer/FireUpgradeRow/PriceLabel
-@onready var fire_button: Button = $CenterContainer/VBoxContainer/FireUpgradeRow/BuyButton
-@onready var back_button: Button = $CenterContainer/VBoxContainer/BackButton
+@onready var coin_label: Label = $CenterContainer/Card/Content/CoinRow/CoinLabel
+@onready var double_jump_price_label: Label = $CenterContainer/Card/Content/DoubleJumpRow/HBox/PriceLabel
+@onready var double_jump_button: Button = $CenterContainer/Card/Content/DoubleJumpRow/HBox/BuyButton
+@onready var glide_price_label: Label = $CenterContainer/Card/Content/GlideRow/HBox/PriceLabel
+@onready var glide_button: Button = $CenterContainer/Card/Content/GlideRow/HBox/BuyButton
+@onready var fire_name_label: Label = $CenterContainer/Card/Content/FireUpgradeRow/HBox/Label
+@onready var fire_price_label: Label = $CenterContainer/Card/Content/FireUpgradeRow/HBox/PriceLabel
+@onready var fire_button: Button = $CenterContainer/Card/Content/FireUpgradeRow/HBox/BuyButton
+@onready var back_button: Button = $CenterContainer/Card/Content/BackButton
 
 var _profile_store: Node
 var _audio_manager: Node
 
 
 func _ready() -> void:
+	UiFx.wire_press_fx(self)
 	double_jump_button.pressed.connect(_on_double_jump_pressed)
 	glide_button.pressed.connect(_on_glide_pressed)
 	fire_button.pressed.connect(_on_fire_upgrade_pressed)
@@ -31,7 +34,7 @@ func set_audio_manager(audio_manager: Node) -> void:
 func open(profile_store: Node) -> void:
 	_profile_store = profile_store
 	refresh()
-	visible = true
+	UiFx.open_screen(self)
 
 
 func refresh() -> void:

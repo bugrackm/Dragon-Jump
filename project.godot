@@ -33,6 +33,10 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="keep_width"
 window/handheld/orientation=1
 
+[gui]
+
+theme/custom="res://assets/ui/theme/dragon_theme.tres"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
