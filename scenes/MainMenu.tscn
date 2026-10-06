@@ -1,13 +1,19 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=9 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
+[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_resource"]
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/player/dragon_frames.tres" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_play.png" id="4_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_shop.png" id="5_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_settings.png" id="6_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icon_coin.png" id="7_resource"]
 
-[ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_menu"]
+[ext_resource type="Script" path="res://scripts/ui/MenuDragon.gd" id="8_dragon"]
 
 [node name="MainMenu" type="CanvasLayer"]
 process_mode = 2
 layer = 10
-script = ExtResource("1_menu")
+script = ExtResource("1_resource")
 
 [node name="Background" type="ColorRect" parent="."]
 process_mode = 3
@@ -17,65 +23,109 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.05, 0.1, 0.2, 0.95)
+color = Color(0.04, 0.1, 0.2, 0)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_resource")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(560, 0)
+custom_minimum_size = Vector2(800, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
-alignment = 1
+theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 72
-text = "DRAGON JUMP"
-horizontal_alignment = 1
-
-[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "PLAY"
-
-[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "SETTINGS"
-
-[node name="ShopButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_colors/font_disabled_color = Color(0.5, 0.5, 0.5, 1)
-theme_override_font_sizes/font_size = 32
-disabled = false
-text = "SHOP"
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+[node name="TitleHolder" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HighScoreLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer/TitleHolder"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_type_variation = &"TitleLabel"
+text = "DRAGON JUMP"
+horizontal_alignment = 1
+vertical_alignment = 1
+mouse_filter = 2
+
+[node name="DragonStage" type="Control" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 260)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
+mouse_filter = 2
+
+[node name="MenuDragon" type="AnimatedSprite2D" parent="CenterContainer/VBoxContainer/DragonStage"]
+position = Vector2(400, 130)
+scale = Vector2(1.8, 1.8)
+texture_filter = 2
+sprite_frames = ExtResource("3_resource")
+animation = &"glide"
+script = ExtResource("8_dragon")
+
+[node name="Card" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(800, 0)
+layout_mode = 2
+unique_name_in_owner = true
+theme_type_variation = &"Card"
+
+[node name="Content" type="VBoxContainer" parent="CenterContainer/VBoxContainer/Card"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="PlayButton" type="Button" parent="CenterContainer/VBoxContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"Button"
+text = "PLAY"
+icon = ExtResource("4_resource")
+expand_icon = true
+
+[node name="ShopButton" type="Button" parent="CenterContainer/VBoxContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"AccentButton"
+text = "SHOP"
+icon = ExtResource("5_resource")
+expand_icon = true
+
+[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
+text = "SETTINGS"
+icon = ExtResource("6_resource")
+expand_icon = true
+
+[node name="HighScoreLabel" type="Label" parent="CenterContainer/VBoxContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"StatLabel"
 text = "High score: 0"
 horizontal_alignment = 1
 
-[node name="CoinLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+
+[node name="CoinRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CoinIcon" type="TextureRect" parent="CenterContainer/VBoxContainer/Card/Content/CoinRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("7_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="CoinLabel" type="Label" parent="CenterContainer/VBoxContainer/Card/Content/CoinRow"]
+layout_mode = 2
+theme_type_variation = &"StatLabel"
 text = "Coins: 0"
 horizontal_alignment = 1

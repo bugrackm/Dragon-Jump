@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/Background.tscn" id="1_background"]
+[ext_resource type="Script" path="res://scripts/ui/MenuBackdrop.gd" id="2_menu"]
+
+[node name="MenuBackdrop" instance=ExtResource("1_background")]
+process_mode = 3
+script = ExtResource("2_menu")

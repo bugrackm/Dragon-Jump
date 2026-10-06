@@ -1,14 +1,18 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
-
-[ext_resource type="Script" path="res://scripts/ShopScreen.gd" id="1_shop"]
+[ext_resource type="Script" path="res://scripts/ShopScreen.gd" id="1_resource"]
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icon_coin.png" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_flap_b.png" id="4_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_glide_a.png" id="5_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_fire.png" id="6_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_back.png" id="7_resource"]
 
 [node name="ShopScreen" type="CanvasLayer"]
 process_mode = 3
 visible = false
 layer = 60
-script = ExtResource("1_shop")
+script = ExtResource("1_resource")
 
 [node name="Background" type="ColorRect" parent="."]
 process_mode = 3
@@ -18,132 +22,184 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.05, 0.1, 0.2, 0.95)
+color = Color(0.04, 0.1, 0.2, 0.15)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_resource")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(560, 0)
+[node name="Card" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(920, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
-alignment = 1
+unique_name_in_owner = true
+theme_type_variation = &"Card"
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/Card"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 72
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
 text = "SHOP"
 horizontal_alignment = 1
 
-[node name="TitleSpacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
+
+[node name="CoinRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CoinIcon" type="TextureRect" parent="CenterContainer/Card/Content/CoinRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_resource")
+expand_mode = 1
+stretch_mode = 5
 mouse_filter = 2
 
-[node name="CoinLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="CoinLabel" type="Label" parent="CenterContainer/Card/Content/CoinRow"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"StatLabel"
 text = "Coins: 0"
 horizontal_alignment = 1
 
-[node name="CoinSpacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
+
+[node name="DoubleJumpRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
+theme_type_variation = &"ShopRow"
+
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/DoubleJumpRow"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_resource")
+expand_mode = 1
+stretch_mode = 5
 mouse_filter = 2
 
-[node name="DoubleJumpRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="Label" type="Label" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/DoubleJumpRow"]
-custom_minimum_size = Vector2(290, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"ShopNameLabel"
 text = "Double Jump"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(260, 0)
+size_flags_horizontal = 3
+autowrap_mode = 2
 
-[node name="PriceLabel" type="Label" parent="CenterContainer/VBoxContainer/DoubleJumpRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
+theme_type_variation = &"ShopPriceLabel"
 text = "200"
-horizontal_alignment = 2
+horizontal_alignment = 1
+custom_minimum_size = Vector2(80, 0)
 
-[node name="BuyButton" type="Button" parent="CenterContainer/VBoxContainer/DoubleJumpRow"]
-custom_minimum_size = Vector2(150, 64)
+[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"AccentButton"
 text = "BUY"
 
-[node name="GlideRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="GlideRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+theme_type_variation = &"ShopRow"
 
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/GlideRow"]
-custom_minimum_size = Vector2(290, 0)
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/GlideRow"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Glide"
+theme_override_constants/separation = 12
 
-[node name="PriceLabel" type="Label" parent="CenterContainer/VBoxContainer/GlideRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
-text = "400"
-horizontal_alignment = 2
-
-[node name="BuyButton" type="Button" parent="CenterContainer/VBoxContainer/GlideRow"]
-custom_minimum_size = Vector2(150, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "BUY"
-
-[node name="FireUpgradeRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/FireUpgradeRow"]
-custom_minimum_size = Vector2(290, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Fire Cooldown Lv.2"
-
-[node name="PriceLabel" type="Label" parent="CenterContainer/VBoxContainer/FireUpgradeRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
-text = "300"
-horizontal_alignment = 2
-
-[node name="BuyButton" type="Button" parent="CenterContainer/VBoxContainer/FireUpgradeRow"]
-custom_minimum_size = Vector2(150, 64)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "BUY"
-
-[node name="BackSpacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("5_resource")
+expand_mode = 1
+stretch_mode = 5
 mouse_filter = 2
 
-[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="Label" type="Label" parent="CenterContainer/Card/Content/GlideRow/HBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"ShopNameLabel"
+text = "Glide"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(260, 0)
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+layout_mode = 2
+theme_type_variation = &"ShopPriceLabel"
+text = "400"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(80, 0)
+
+[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+theme_type_variation = &"AccentButton"
+text = "BUY"
+
+[node name="FireUpgradeRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_type_variation = &"ShopRow"
+
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/FireUpgradeRow"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("6_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+layout_mode = 2
+theme_type_variation = &"ShopNameLabel"
+text = "Fire Cooldown Lv.2"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(260, 0)
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+layout_mode = 2
+theme_type_variation = &"ShopPriceLabel"
+text = "300"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(80, 0)
+
+[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+theme_type_variation = &"AccentButton"
+text = "BUY"
+
+[node name="BackButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
 text = "BACK"
+icon = ExtResource("7_resource")
+expand_icon = true

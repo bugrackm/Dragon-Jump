@@ -1,14 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
-
-[ext_resource type="Script" path="res://scripts/GameOverScreen.gd" id="1_game_over"]
+[ext_resource type="Script" path="res://scripts/GameOverScreen.gd" id="1_resource"]
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icon_coin.png" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_retry.png" id="4_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_home.png" id="5_resource"]
 
 [node name="GameOverScreen" type="CanvasLayer"]
 process_mode = 2
 visible = false
 layer = 20
-script = ExtResource("1_game_over")
+script = ExtResource("1_resource")
 
 [node name="Background" type="ColorRect" parent="."]
 process_mode = 3
@@ -18,63 +20,105 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.05, 0.1, 0.2, 0.95)
+color = Color(0.04, 0.1, 0.2, 0.55)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_resource")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(560, 0)
+[node name="Card" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(800, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
-alignment = 1
+unique_name_in_owner = true
+theme_type_variation = &"Card"
 
-[node name="GameOverLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/Card"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 64
+theme_override_constants/separation = 20
+
+[node name="GameOverLabel" type="Label" parent="CenterContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
 text = "GAME OVER"
 horizontal_alignment = 1
 
-[node name="ScoreLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+
+[node name="ScoreLabel" type="Label" parent="CenterContainer/Card/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 42
+theme_type_variation = &"StatLabel"
 text = "Altitude: 0"
 horizontal_alignment = 1
 
-[node name="HighScoreLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
-text = "High score: 0"
-horizontal_alignment = 1
 
-[node name="CoinsLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.25, 1)
-theme_override_font_sizes/font_size = 28
-text = "Coins this run: 0"
-horizontal_alignment = 1
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 30)
+[node name="BadgeHolder" type="Control" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="RetryButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "RETRY"
+[node name="NewBestBadge" type="PanelContainer" parent="CenterContainer/Card/Content/BadgeHolder"]
+visible = false
+anchors_preset = 10
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_right = 160.0
+offset_bottom = 72.0
+theme_type_variation = &"Badge"
 
-[node name="MenuButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="BadgeLabel" type="Label" parent="CenterContainer/Card/Content/BadgeHolder/NewBestBadge"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"BadgeLabel"
+text = "NEW BEST!"
+horizontal_alignment = 1
+
+
+[node name="HighScoreLabel" type="Label" parent="CenterContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"StatLabel"
+text = "High score: 0"
+horizontal_alignment = 1
+
+
+[node name="CoinsRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 12
+
+[node name="CoinIcon" type="TextureRect" parent="CenterContainer/Card/Content/CoinsRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="CoinsLabel" type="Label" parent="CenterContainer/Card/Content/CoinsRow"]
+layout_mode = 2
+theme_type_variation = &"StatLabel"
+text = "Coins this run: 0"
+horizontal_alignment = 1
+
+
+[node name="RetryButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"Button"
+text = "RETRY"
+icon = ExtResource("4_resource")
+expand_icon = true
+
+[node name="MenuButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
 text = "MENU"
+icon = ExtResource("5_resource")
+expand_icon = true

@@ -11,10 +11,33 @@
 Used for: platform tiles, coin pickup frames, spring, parallax background
 layers, cloud, particle textures, coin HUD icon.
 
+### Kenney Game Icons
+- Source: https://kenney.nl/assets/game-icons
+- Author: Kenney Vleugels (www.kenney.nl)
+- License: **CC0 1.0 Universal**
+
+Used for: UI icons in `assets/ui/icons/` (white, 2x PNG). License copy: `assets/ui/icons/Kenney-License.txt`.
+
 ### Custom artwork
 Dragon player character (11 animation poses), wyvern enemy (4 flap frames)
 and blob monster enemy (2 idle frames) were created specifically for
 Dragon Jump. Not derived from any third-party pack.
+
+## Fonts
+
+License texts live in `assets/ui/fonts/*-OFL.txt`.
+
+### Lilita One
+- Source: https://github.com/google/fonts/tree/main/ofl/lilitaone
+- Author: Juan Montoreano
+- License: **SIL Open Font License 1.1**
+
+### Fredoka
+- Source: https://github.com/google/fonts/tree/main/ofl/fredoka
+- Author: The Fredoka Project Authors (Milena Brandão / Hafontia)
+- License: **SIL Open Font License 1.1**
+
+Variable font (`Fredoka-Variable.ttf`).
 
 ## Audio
 
