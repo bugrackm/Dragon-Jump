@@ -1,14 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
-
-[ext_resource type="Script" path="res://scripts/PauseOverlay.gd" id="1_pause"]
+[ext_resource type="Script" path="res://scripts/PauseOverlay.gd" id="1_resource"]
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_play.png" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_settings.png" id="4_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_home.png" id="5_resource"]
 
 [node name="PauseOverlay" type="CanvasLayer"]
 process_mode = 2
 visible = false
 layer = 40
-script = ExtResource("1_pause")
+script = ExtResource("1_resource")
 
 [node name="Background" type="ColorRect" parent="."]
 process_mode = 3
@@ -18,49 +20,55 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0, 0, 0, 0.7)
+color = Color(0.04, 0.1, 0.2, 0.6)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_resource")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(560, 0)
+[node name="Card" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(720, 0)
 layout_mode = 2
-theme_override_constants/separation = 18
-alignment = 1
+unique_name_in_owner = true
+theme_type_variation = &"Card"
 
-[node name="PausedLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/Card"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 56
+theme_override_constants/separation = 20
+
+[node name="PausedLabel" type="Label" parent="CenterContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
 text = "PAUSED"
 horizontal_alignment = 1
 
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-mouse_filter = 2
 
-[node name="ResumeButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="ResumeButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"Button"
 text = "RESUME"
+icon = ExtResource("3_resource")
+expand_icon = true
 
-[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="SettingsButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"SecondaryButton"
 text = "SETTINGS"
+icon = ExtResource("4_resource")
+expand_icon = true
 
-[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="QuitButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"SecondaryButton"
 text = "QUIT TO MENU"
+icon = ExtResource("5_resource")
+expand_icon = true

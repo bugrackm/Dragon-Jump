@@ -2,6 +2,8 @@ extends Node2D
 
 ## Routes top-level screens and composes a fresh gameplay world for each run.
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+const MENU_BACKDROP_SCENE := preload("res://scenes/ui/MenuBackdrop.tscn")
 const MAIN_MENU_SCENE := preload("res://scenes/MainMenu.tscn")
 const GAME_OVER_SCREEN_SCENE := preload("res://scenes/GameOverScreen.tscn")
 const SETTINGS_MENU_SCENE := preload("res://scenes/SettingsMenu.tscn")
@@ -16,6 +18,7 @@ const SHOP_SCREEN_SCENE := preload("res://scenes/ShopScreen.tscn")
 @onready var audio_manager: AudioManager = $AudioManager
 @onready var hud = $HUD
 
+var _menu_backdrop: ParallaxBackground
 var _main_menu: CanvasLayer
 var _game_over_screen: CanvasLayer
 var _settings_menu: CanvasLayer
@@ -71,18 +74,25 @@ func _quit_cleanly() -> void:
 
 func _on_run_coins_changed(amount: int) -> void:
 	hud.set_coins(profile_store.total_coins + amount)
+	if amount > 0:
+		hud.bump_coins()
+
+
+func _is_open(layer: CanvasLayer) -> bool:
+	return is_instance_valid(layer) and layer.visible and not UiFx.is_closing(layer)
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey:
 		return
 	if event.keycode != KEY_ESCAPE or not event.pressed or event.echo:
 		return
-	if is_instance_valid(_shop_screen) and _shop_screen.visible:
+	if _is_open(_shop_screen):
 		_hide_shop()
 		get_viewport().set_input_as_handled()
 		return
 
-	if is_instance_valid(_settings_menu) and _settings_menu.visible:
+	if _is_open(_settings_menu):
 		_hide_settings()
 		get_viewport().set_input_as_handled()
 		return
@@ -128,14 +138,14 @@ func _create_persistent_overlays() -> void:
 	add_child(_settings_menu)
 	_settings_menu.call("set_audio_manager", audio_manager)
 	_settings_menu.connect("back_requested", _hide_settings)
-	_settings_menu.visible = false
+	UiFx.hide_now(_settings_menu)
 
 	_game_over_screen = GAME_OVER_SCREEN_SCENE.instantiate() as CanvasLayer
 	add_child(_game_over_screen)
 	_game_over_screen.call("set_audio_manager", audio_manager)
 	_game_over_screen.connect("retry_requested", _retry)
 	_game_over_screen.connect("menu_requested", _quit_to_menu)
-	_game_over_screen.visible = false
+	UiFx.hide_now(_game_over_screen)
 
 	_pause_overlay = PAUSE_OVERLAY_SCENE.instantiate() as CanvasLayer
 	add_child(_pause_overlay)
@@ -143,14 +153,14 @@ func _create_persistent_overlays() -> void:
 	_pause_overlay.connect("resume_requested", _resume_game)
 	_pause_overlay.connect("settings_requested", _show_settings_from_pause)
 	_pause_overlay.connect("quit_to_menu_requested", _quit_to_menu)
-	_pause_overlay.visible = false
+	UiFx.hide_now(_pause_overlay)
 
 	_shop_screen = SHOP_SCREEN_SCENE.instantiate() as CanvasLayer
 	add_child(_shop_screen)
 	_shop_screen.call("set_audio_manager", audio_manager)
 	_shop_screen.connect("back_requested", _hide_shop)
 	_shop_screen.connect("purchase_made", _on_shop_purchase_made)
-	_shop_screen.visible = false
+	UiFx.hide_now(_shop_screen)
 
 
 func _ensure_main_menu() -> void:
@@ -165,9 +175,13 @@ func _ensure_main_menu() -> void:
 
 
 func _show_main_menu() -> void:
+	hud.set_stats_visible(false)
+	if not is_instance_valid(_menu_backdrop):
+		_menu_backdrop = MENU_BACKDROP_SCENE.instantiate() as ParallaxBackground
+		add_child(_menu_backdrop)
 	_ensure_main_menu()
 	_main_menu.call("refresh", profile_store)
-	_main_menu.visible = true
+	UiFx.open_screen(_main_menu)
 
 
 func _start_game() -> void:
@@ -177,14 +191,17 @@ func _start_game() -> void:
 	if is_instance_valid(_current_world):
 		return
 
+	if is_instance_valid(_menu_backdrop):
+		_menu_backdrop.free()
+		_menu_backdrop = null
 	if is_instance_valid(_main_menu):
-		_main_menu.visible = false
+		UiFx.hide_now(_main_menu)
 		_main_menu.queue_free()
 		_main_menu = null
-	_settings_menu.visible = false
-	_game_over_screen.visible = false
-	_pause_overlay.visible = false
-	_shop_screen.visible = false
+	UiFx.hide_now(_settings_menu)
+	UiFx.hide_now(_game_over_screen)
+	UiFx.hide_now(_pause_overlay)
+	UiFx.hide_now(_shop_screen)
 	get_tree().paused = false
 
 	_current_world = world_scene.instantiate() as Node2D
@@ -254,7 +271,7 @@ func _pause_game() -> void:
 	hud.hide_gameplay_ui()
 	get_tree().paused = true
 	audio_manager.duck_music()
-	_pause_overlay.visible = true
+	UiFx.open_screen(_pause_overlay)
 
 
 func _resume_game() -> void:
@@ -263,13 +280,13 @@ func _resume_game() -> void:
 	get_tree().paused = false
 	audio_manager.unduck_music()
 	run_session.resume_run()
-	_pause_overlay.visible = false
+	UiFx.close_screen(_pause_overlay)
 	hud.show_playing()
 
 
 func _retry() -> void:
 	audio_manager.restart_music()
-	_game_over_screen.visible = false
+	UiFx.hide_now(_game_over_screen)
 	_free_current_world()
 	_start_game()
 
@@ -280,10 +297,10 @@ func _quit_to_menu() -> void:
 	_free_current_world()
 	run_session.state = run_session.RunState.READY
 	hud.hide_gameplay_ui()
-	_game_over_screen.visible = false
-	_pause_overlay.visible = false
-	_settings_menu.visible = false
-	_shop_screen.visible = false
+	UiFx.hide_now(_game_over_screen)
+	UiFx.hide_now(_pause_overlay)
+	UiFx.hide_now(_settings_menu)
+	UiFx.hide_now(_shop_screen)
 	_show_main_menu()
 
 
@@ -291,45 +308,49 @@ func _show_settings() -> void:
 	if run_session.state != run_session.RunState.READY:
 		return
 	_settings_return_to_pause = false
+	UiFx.hide_now(_main_menu)
 	_settings_menu.call("open", profile_store)
 
 
 func _show_settings_from_pause() -> void:
 	_settings_return_to_pause = true
-	_pause_overlay.visible = false
+	UiFx.hide_now(_pause_overlay)
 	_settings_menu.call("open", profile_store)
 
 
 func _hide_settings() -> void:
-	_settings_menu.visible = false
+	if not _is_open(_settings_menu):
+		return
+	UiFx.close_screen(_settings_menu)
 	if _settings_return_to_pause:
 		_settings_return_to_pause = false
-		_pause_overlay.visible = true
+		UiFx.open_screen(_pause_overlay)
+	else:
+		_show_main_menu()
 
 
 func _show_shop() -> void:
 	if run_session.state != run_session.RunState.READY:
 		return
-	if not is_instance_valid(_main_menu) or not _main_menu.visible:
+	if not _is_open(_main_menu):
 		return
 	if (
-		_settings_menu.visible
-		or _pause_overlay.visible
-		or _game_over_screen.visible
-		or _shop_screen.visible
+		_is_open(_settings_menu)
+		or _is_open(_pause_overlay)
+		or _is_open(_game_over_screen)
+		or _is_open(_shop_screen)
 	):
 		return
 
-	_main_menu.visible = false
+	UiFx.hide_now(_main_menu)
 	_shop_screen.call("open", profile_store)
-	_shop_screen.visible = true
 	_shop_screen.call("grab_focus_on_first_button")
 
 
 func _hide_shop() -> void:
-	if not is_instance_valid(_shop_screen) or not _shop_screen.visible:
+	if not _is_open(_shop_screen):
 		return
-	_shop_screen.visible = false
+	UiFx.close_screen(_shop_screen)
 	_show_main_menu()
 
 
@@ -380,6 +401,7 @@ func _on_game_over(final_score: int) -> void:
 		_enemy_manager.set_active(false)
 	if is_instance_valid(_coin_manager):
 		_coin_manager.set_active(false)
+	var previous_best: int = profile_store.high_score
 	profile_store.update_high_score(final_score)
 	profile_store.add_coins(run_session.run_coins)
 	hud.hide_gameplay_ui()
@@ -387,7 +409,8 @@ func _on_game_over(final_score: int) -> void:
 		"show_screen",
 		final_score,
 		profile_store.high_score,
-		run_session.run_coins
+		run_session.run_coins,
+		final_score > previous_best
 	)
 
 
