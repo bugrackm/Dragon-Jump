@@ -41,6 +41,7 @@ var _last_difficulty_factor := -1.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().auto_accept_quit = false
 	audio_manager.initialize(profile_store)
 	run_session.score_changed.connect(_on_score_changed)
 	run_session.game_over.connect(_on_game_over)
@@ -53,6 +54,19 @@ func _ready() -> void:
 	_create_persistent_overlays()
 	_show_main_menu()
 	hud.hide_gameplay_ui()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_quit_cleanly()
+
+
+## Stops audio and lets the audio server drop its playbacks before quitting,
+## so the music stream is not still referenced at shutdown.
+func _quit_cleanly() -> void:
+	audio_manager.stop_all_audio()
+	await get_tree().create_timer(0.1, true, false, true).timeout
+	get_tree().quit()
 
 
 func _on_run_coins_changed(amount: int) -> void:
@@ -239,6 +253,7 @@ func _pause_game() -> void:
 		return
 	hud.hide_gameplay_ui()
 	get_tree().paused = true
+	audio_manager.duck_music()
 	_pause_overlay.visible = true
 
 
@@ -246,12 +261,14 @@ func _resume_game() -> void:
 	if run_session.state != run_session.RunState.PAUSED:
 		return
 	get_tree().paused = false
+	audio_manager.unduck_music()
 	run_session.resume_run()
 	_pause_overlay.visible = false
 	hud.show_playing()
 
 
 func _retry() -> void:
+	audio_manager.restart_music()
 	_game_over_screen.visible = false
 	_free_current_world()
 	_start_game()
@@ -259,6 +276,7 @@ func _retry() -> void:
 
 func _quit_to_menu() -> void:
 	get_tree().paused = false
+	audio_manager.restart_music()
 	_free_current_world()
 	run_session.state = run_session.RunState.READY
 	hud.hide_gameplay_ui()

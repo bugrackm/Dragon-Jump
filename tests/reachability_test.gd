@@ -66,6 +66,7 @@ func _run() -> void:
 		_expect(_checked >= SEED_COUNT * 10 and _integration_checks >= 30, "full audit completed")
 		failures += _chain_violations + _stacking_violations + _hazard_violations + _integration_failures
 	print("heights=%d seeds_total=%d violations=%d" % [VISIBLE_HEIGHTS.size(), SEED_COUNT * VISIBLE_HEIGHTS.size(), failures])
+	await create_timer(0.3, true, false, true).timeout
 	quit(0 if failures == 0 else 1)
 
 
@@ -285,4 +286,5 @@ func _check_world_and_fire() -> void:
 	_expect(not main._rising_fire.visible and not main._rising_fire.get("_active"), "retry resets fire")
 	main.run_session.end_run()
 	_expect(not main._rising_fire.is_physics_processing(), "other game-over causes also stop fire")
+	main.audio_manager.get_music_player().stop()
 	main.free()

@@ -59,6 +59,7 @@ func _run() -> void:
 	await _check_ui()
 	_sample_sky()
 	print("layout_checks=%d passed=%d failed=%d" % [_checks, _checks - _failures, _failures])
+	await create_timer(0.3, true, false, true).timeout
 	quit(0 if _failures == 0 else 1)
 
 
@@ -152,6 +153,7 @@ func _check_background(height: int) -> void:
 	main._platform_manager.update_for_camera(camera_y)
 	_expect(main._platform_manager._highest_platform_position.y <= _layout.visible_top(camera_y)
 		- main._platform_manager.TOP_SPAWN_BUFFER, "live spawn ceiling")
+	main.audio_manager.get_music_player().stop()
 	main.free()
 	root.size = Vector2i(1080, height)
 	await process_frame

@@ -16,6 +16,8 @@ const SECTION_ECONOMY := "economy"
 const SECTION_SETTINGS := "settings"
 const SECTION_ABILITIES := "abilities"
 
+const DEFAULT_SFX_VOLUME := 1.0
+const DEFAULT_MUSIC_VOLUME := 0.6
 const MAX_FIRE_BREATH_LEVEL := 3
 const COST_DOUBLE_JUMP := 200
 const COST_GLIDE := 400
@@ -27,6 +29,8 @@ var high_score := 0
 var total_coins := 0
 var sound_enabled := true
 var music_enabled := true
+var sfx_volume := DEFAULT_SFX_VOLUME
+var music_volume := DEFAULT_MUSIC_VOLUME
 var double_jump_unlocked := false
 var glide_unlocked := false
 var fire_breath_level := 1
@@ -92,6 +96,28 @@ func load_profile() -> void:
 		"music_enabled",
 		true
 	)
+	var loaded_sfx_volume: Variant = config.get_value(
+		SECTION_SETTINGS,
+		"sfx_volume",
+		DEFAULT_SFX_VOLUME
+	)
+	var loaded_music_volume: Variant = config.get_value(
+		SECTION_SETTINGS,
+		"music_volume",
+		DEFAULT_MUSIC_VOLUME
+	)
+	var sfx_volume_is_valid := _is_valid_volume(loaded_sfx_volume)
+	var music_volume_is_valid := _is_valid_volume(loaded_music_volume)
+	sfx_volume = (
+		clampf(float(loaded_sfx_volume), 0.0, 1.0)
+		if sfx_volume_is_valid
+		else DEFAULT_SFX_VOLUME
+	)
+	music_volume = (
+		clampf(float(loaded_music_volume), 0.0, 1.0)
+		if music_volume_is_valid
+		else DEFAULT_MUSIC_VOLUME
+	)
 	var sound_is_valid := typeof(loaded_sound_enabled) == TYPE_BOOL
 	var music_is_valid := typeof(loaded_music_enabled) == TYPE_BOOL
 	if loaded_schema_version >= 3:
@@ -148,6 +174,8 @@ func load_profile() -> void:
 	var economy_missing := not config.has_section_key(SECTION_ECONOMY, "total_coins")
 	var sound_missing := not config.has_section_key(SECTION_SETTINGS, "sound_enabled")
 	var music_missing := not config.has_section_key(SECTION_SETTINGS, "music_enabled")
+	var sfx_volume_missing := not config.has_section_key(SECTION_SETTINGS, "sfx_volume")
+	var music_volume_missing := not config.has_section_key(SECTION_SETTINGS, "music_volume")
 	var double_jump_missing := not config.has_section_key(
 		SECTION_ABILITIES,
 		"double_jump_unlocked"
@@ -166,6 +194,8 @@ func load_profile() -> void:
 		or economy_missing
 		or sound_missing
 		or music_missing
+		or sfx_volume_missing
+		or music_volume_missing
 		or double_jump_missing
 		or glide_missing
 		or fire_level_missing
@@ -173,6 +203,8 @@ func load_profile() -> void:
 		or not coins_are_valid
 		or not sound_is_valid
 		or not music_is_valid
+		or not sfx_volume_is_valid
+		or not music_volume_is_valid
 		or not double_jump_is_valid
 		or not glide_is_valid
 		or not fire_level_was_in_range
@@ -205,6 +237,26 @@ func set_music_enabled(value: bool) -> void:
 	music_enabled = value
 	settings_changed.emit("music_enabled", music_enabled)
 	save_profile()
+
+
+func set_sfx_volume(value: float) -> void:
+	sfx_volume = clampf(value, 0.0, 1.0)
+	settings_changed.emit("sfx_volume", sfx_volume)
+	save_profile()
+
+
+func set_music_volume(value: float) -> void:
+	music_volume = clampf(value, 0.0, 1.0)
+	settings_changed.emit("music_volume", music_volume)
+	save_profile()
+
+
+func get_sfx_volume() -> float:
+	return sfx_volume
+
+
+func get_music_volume() -> float:
+	return music_volume
 
 
 func get_sound_enabled() -> bool:
@@ -315,6 +367,8 @@ func save_profile() -> bool:
 	config.set_value(SECTION_ECONOMY, "total_coins", total_coins)
 	config.set_value(SECTION_SETTINGS, "sound_enabled", sound_enabled)
 	config.set_value(SECTION_SETTINGS, "music_enabled", music_enabled)
+	config.set_value(SECTION_SETTINGS, "sfx_volume", sfx_volume)
+	config.set_value(SECTION_SETTINGS, "music_volume", music_volume)
 	config.set_value(SECTION_ABILITIES, "double_jump_unlocked", double_jump_unlocked)
 	config.set_value(SECTION_ABILITIES, "glide_unlocked", glide_unlocked)
 	config.set_value(SECTION_ABILITIES, "fire_breath_level", fire_breath_level)
@@ -332,6 +386,15 @@ func _reset_to_defaults() -> void:
 	total_coins = 0
 	sound_enabled = true
 	music_enabled = true
+	sfx_volume = DEFAULT_SFX_VOLUME
+	music_volume = DEFAULT_MUSIC_VOLUME
 	double_jump_unlocked = false
 	glide_unlocked = false
 	fire_breath_level = 1
+
+
+func _is_valid_volume(value: Variant) -> bool:
+	if typeof(value) != TYPE_FLOAT and typeof(value) != TYPE_INT:
+		return false
+	var number := float(value)
+	return not is_nan(number) and not is_inf(number)

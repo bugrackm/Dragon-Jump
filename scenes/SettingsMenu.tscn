@@ -74,6 +74,46 @@ text = "MUSIC"
 custom_minimum_size = Vector2(96, 64)
 layout_mode = 2
 
+[node name="SfxVolumeRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="SfxVolumeRowLabel" type="Label" parent="CenterContainer/VBoxContainer/SfxVolumeRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "SFX VOLUME"
+
+[node name="SfxVolumeSlider" type="HSlider" parent="CenterContainer/VBoxContainer/SfxVolumeRow"]
+custom_minimum_size = Vector2(336, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="MusicVolumeRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="MusicVolumeRowLabel" type="Label" parent="CenterContainer/VBoxContainer/MusicVolumeRow"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "MUSIC VOLUME"
+
+[node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/VBoxContainer/MusicVolumeRow"]
+custom_minimum_size = Vector2(336, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 1.0
+
 [node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
