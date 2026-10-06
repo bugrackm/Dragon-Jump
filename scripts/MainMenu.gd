@@ -1,27 +1,31 @@
 extends CanvasLayer
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+
 signal play_requested
 signal settings_requested
 signal shop_requested
 
-@onready var high_score_label: Label = $CenterContainer/VBoxContainer/HighScoreLabel
-@onready var coin_label: Label = $CenterContainer/VBoxContainer/CoinLabel
+@onready var high_score_label: Label = $CenterContainer/VBoxContainer/Card/Content/HighScoreLabel
+@onready var coin_label: Label = $CenterContainer/VBoxContainer/Card/Content/CoinRow/CoinLabel
 
 var _audio_manager: Node
 
 
 func _ready() -> void:
-	$CenterContainer/VBoxContainer/PlayButton.pressed.connect(
+	UiFx.wire_press_fx(self)
+	UiFx.idle_bob(find_child("TitleLabel", true, false), 7.0, 2.5)
+	$CenterContainer/VBoxContainer/Card/Content/PlayButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")
 			play_requested.emit()
 	)
-	$CenterContainer/VBoxContainer/SettingsButton.pressed.connect(
+	$CenterContainer/VBoxContainer/Card/Content/SettingsButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")
 			settings_requested.emit()
 	)
-	$CenterContainer/VBoxContainer/ShopButton.pressed.connect(
+	$CenterContainer/VBoxContainer/Card/Content/ShopButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")
 			shop_requested.emit()

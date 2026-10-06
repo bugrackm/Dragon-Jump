@@ -2,9 +2,15 @@ extends Button
 
 ## Floating fire button with exclusive touch capture.
 
+const UiFx := preload("res://scripts/ui/UiFx.gd")
+
 signal fire_requested
 
 var _fire_enabled := true
+
+
+func _ready() -> void:
+	fire_requested.connect(func() -> void: UiFx.bounce(self))
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -80,7 +80,14 @@ func _check_ui() -> void:
 	var changes := [0]
 	var on_change := func() -> void: changes[0] += 1
 	_layout.layout_changed.connect(on_change)
-	for insets in [Vector4(0, 120, 0, 90), Vector4(60, 140, 80, 100), Vector4.ZERO]:
+	for case in [
+		[2400, Vector4(0, 120, 0, 90)],
+		[2400, Vector4(60, 140, 80, 100)],
+		[2400, Vector4.ZERO],
+		[1920, Vector4(0, 140, 0, 100)],
+	]:
+		viewport.size = Vector2i(1080, case[0])
+		var insets: Vector4 = case[1]
 		_layout.debug_insets_override = insets
 		var count: int = changes[0]
 		_layout.refresh()
@@ -89,10 +96,13 @@ func _check_ui() -> void:
 		await process_frame
 		var safe_rect := Rect2(Vector2(insets.x, insets.y),
 			Vector2(viewport.size) - Vector2(insets.x + insets.z, insets.y + insets.w))
-		for path in ["MarginContainer/Rows/ScoreLabel", "MarginContainer/Rows/CoinLabel", "PauseButton", "FireButton"]:
+		for path in ["MarginContainer/Rows/ScoreLabel", "MarginContainer/Rows/HighScoreLabel",
+			"MarginContainer/Rows/CoinRow/CoinLabel", "MarginContainer/Rows/CoinRow/CoinIcon", "PauseButton", "FireButton"]:
 			_expect(safe_rect.encloses((hud.get_node(path) as Control).get_global_rect()), "safe HUD " + path)
 		var pause_rect: Rect2 = hud.get_node("PauseButton").get_global_rect()
 		_expect(pause_rect.size.x >= 120 and pause_rect.size.y >= 120, "pause touch target")
+		_expect(pause_rect.size.is_equal_approx(Vector2(120, 120)), "pause size unchanged")
+		_expect(hud.get_node("FireButton").size.is_equal_approx(Vector2(140, 140)), "fire size unchanged")
 		_expect(is_equal_approx(pause_rect.position.y, _edge(40, insets.y)), "pause top design margin")
 		_expect(is_equal_approx(pause_rect.end.x, viewport.size.x - _edge(40, insets.z)), "pause right design margin")
 		_expect(is_equal_approx(hud.get_node("FireButton").get_global_rect().end.y,
@@ -103,9 +113,36 @@ func _check_ui() -> void:
 			_expect(safe_rect.is_equal_approx(menu.get_node("CenterContainer").get_global_rect()), "safe content " + menu.name)
 			_expect(menu.get_node("Background").get_global_rect().is_equal_approx(
 				Rect2(Vector2.ZERO, Vector2(viewport.size))), "full bleed " + menu.name)
+			_expect(safe_rect.encloses((menu.get_node("%Card") as Control).get_global_rect()), "safe Card " + menu.name)
+			var content := menu.get_node("%Card/Content") as Control
+			if menu.name == "SettingsMenu":
+				var label_x := -1.0
+				for row_name in ["SoundRow", "MusicRow", "SfxVolumeRow", "MusicVolumeRow"]:
+					var row := content.get_node(row_name) as HBoxContainer
+					_expect(is_equal_approx(row.size.x, content.size.x), "settings row matches Content " + row_name)
+					_expect(content.get_global_rect().encloses(row.get_global_rect()), "settings row inside Content " + row_name)
+					_expect(row.get_child(0) is TextureRect and row.get_child(1) is Label, "settings icon label order " + row_name)
+					var label := row.get_child(1) as Label
+					_expect(label.horizontal_alignment == HORIZONTAL_ALIGNMENT_LEFT, "settings label left aligned " + row_name)
+					if label_x < 0:
+						label_x = label.get_global_rect().position.x
+					_expect(is_equal_approx(label.get_global_rect().position.x, label_x), "settings labels share left edge " + row_name)
+					var control := row.get_child(2) as Control
+					_expect(is_equal_approx(control.get_global_rect().end.x, content.get_global_rect().end.x), "settings control right aligned " + row_name)
+					for child in row.get_children():
+						_expect(row.get_global_rect().encloses(child.get_global_rect()), "settings child inside row " + child.name)
+			if menu.name == "ShopScreen":
+				for row_name in ["DoubleJumpRow", "GlideRow", "FireUpgradeRow"]:
+					var row := content.get_node(row_name) as Control
+					_expect(content.get_global_rect().encloses(row.get_global_rect()), "shop row inside Content " + row_name)
+					for label_name in ["Label", "PriceLabel"]:
+						var label := row.get_node("HBox/" + label_name) as Label
+						_expect(label.get_theme_font_size("font_size") >= 36, "readable shop text " + row_name + label_name)
+						_expect(row.get_global_rect().encloses(label.get_global_rect()), "shop text inside row " + row_name + label_name)
 			for button in menu.find_children("*", "BaseButton"):
+				_expect(button.size.y >= 72, "menu touch target " + menu.name + "/" + button.name)
 				_expect(safe_rect.encloses(button.get_global_rect()), "safe menu button " + menu.name + "/" + button.name)
-	_expect(changes[0] == 3, "override changes emit once each")
+	_expect(changes[0] == 4, "override changes emit once each")
 	_layout.debug_insets_override = Vector4(-10, 120, -20, 90)
 	_expect(_layout.safe_insets == Vector4(0, 120, 0, 90), "debug insets clamp nonnegative")
 	_layout.layout_changed.disconnect(on_change)

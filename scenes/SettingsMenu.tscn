@@ -1,14 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_safe"]
-
-[ext_resource type="Script" path="res://scripts/SettingsMenu.gd" id="1_settings"]
+[ext_resource type="Script" path="res://scripts/SettingsMenu.gd" id="1_resource"]
+[ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_sound_on.png" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_music_on.png" id="4_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/icons/icon_back.png" id="5_resource"]
 
 [node name="SettingsMenu" type="CanvasLayer"]
 process_mode = 2
 visible = false
 layer = 50
-script = ExtResource("1_settings")
+script = ExtResource("1_resource")
 
 [node name="Background" type="ColorRect" parent="."]
 process_mode = 3
@@ -18,109 +20,151 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.05, 0.1, 0.2, 0.95)
+color = Color(0.04, 0.1, 0.2, 0.45)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-script = ExtResource("2_safe")
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2_resource")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(560, 0)
+[node name="Card" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(820, 0)
 layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
+unique_name_in_owner = true
+theme_type_variation = &"Card"
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/Card"]
+custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 48
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/Card/Content"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
 text = "SETTINGS"
 horizontal_alignment = 1
 
-[node name="SoundRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+
+[node name="SoundRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_constants/separation = 24
-alignment = 1
 
-[node name="SoundLabel" type="Label" parent="CenterContainer/VBoxContainer/SoundRow"]
-custom_minimum_size = Vector2(320, 0)
+[node name="SoundIcon" type="TextureRect" parent="CenterContainer/Card/Content/SoundRow"]
+self_modulate = Color(0.1019608, 0.1803922, 0.2901961, 1)
+custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "SOUND"
-
-[node name="SoundToggle" type="CheckButton" parent="CenterContainer/VBoxContainer/SoundRow"]
-custom_minimum_size = Vector2(96, 64)
-layout_mode = 2
-
-[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="MusicLabel" type="Label" parent="CenterContainer/VBoxContainer/MusicRow"]
-custom_minimum_size = Vector2(320, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "MUSIC"
-
-[node name="MusicToggle" type="CheckButton" parent="CenterContainer/VBoxContainer/MusicRow"]
-custom_minimum_size = Vector2(96, 64)
-layout_mode = 2
-
-[node name="SfxVolumeRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="SfxVolumeRowLabel" type="Label" parent="CenterContainer/VBoxContainer/SfxVolumeRow"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "SFX VOLUME"
-
-[node name="SfxVolumeSlider" type="HSlider" parent="CenterContainer/VBoxContainer/SfxVolumeRow"]
-custom_minimum_size = Vector2(336, 64)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 1.0
-step = 0.05
-value = 1.0
-
-[node name="MusicVolumeRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 64)
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="MusicVolumeRowLabel" type="Label" parent="CenterContainer/VBoxContainer/MusicVolumeRow"]
-custom_minimum_size = Vector2(200, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "MUSIC VOLUME"
-
-[node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/VBoxContainer/MusicVolumeRow"]
-custom_minimum_size = Vector2(336, 64)
-layout_mode = 2
-size_flags_horizontal = 3
-max_value = 1.0
-step = 0.05
-value = 1.0
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 30)
-layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_resource")
+expand_mode = 1
+stretch_mode = 5
 mouse_filter = 2
 
-[node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 72)
+[node name="SoundLabel" type="Label" parent="CenterContainer/Card/Content/SoundRow"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_type_variation = &"Label"
+text = "SOUND"
+horizontal_alignment = 0
+size_flags_horizontal = 3
+
+[node name="SoundToggle" type="CheckButton" parent="CenterContainer/Card/Content/SoundRow"]
+custom_minimum_size = Vector2(112, 80)
+layout_mode = 2
+
+
+[node name="MusicRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="MusicIcon" type="TextureRect" parent="CenterContainer/Card/Content/MusicRow"]
+self_modulate = Color(0.1019608, 0.1803922, 0.2901961, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="MusicLabel" type="Label" parent="CenterContainer/Card/Content/MusicRow"]
+layout_mode = 2
+theme_type_variation = &"Label"
+text = "MUSIC"
+horizontal_alignment = 0
+size_flags_horizontal = 3
+
+[node name="MusicToggle" type="CheckButton" parent="CenterContainer/Card/Content/MusicRow"]
+custom_minimum_size = Vector2(112, 80)
+layout_mode = 2
+
+
+[node name="SfxVolumeRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="SfxVolumeIcon" type="TextureRect" parent="CenterContainer/Card/Content/SfxVolumeRow"]
+self_modulate = Color(0.1019608, 0.1803922, 0.2901961, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("3_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="SfxVolumeRowLabel" type="Label" parent="CenterContainer/Card/Content/SfxVolumeRow"]
+layout_mode = 2
+theme_type_variation = &"Label"
+text = "SFX VOLUME"
+horizontal_alignment = 0
+size_flags_horizontal = 3
+
+[node name="SfxVolumeSlider" type="HSlider" parent="CenterContainer/Card/Content/SfxVolumeRow"]
+custom_minimum_size = Vector2(280, 80)
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="MusicVolumeRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="MusicVolumeIcon" type="TextureRect" parent="CenterContainer/Card/Content/MusicVolumeRow"]
+self_modulate = Color(0.1019608, 0.1803922, 0.2901961, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("4_resource")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="MusicVolumeRowLabel" type="Label" parent="CenterContainer/Card/Content/MusicVolumeRow"]
+layout_mode = 2
+theme_type_variation = &"Label"
+text = "MUSIC VOLUME"
+horizontal_alignment = 0
+size_flags_horizontal = 3
+
+[node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/Card/Content/MusicVolumeRow"]
+custom_minimum_size = Vector2(280, 80)
+layout_mode = 2
+max_value = 1.0
+step = 0.05
+value = 1.0
+
+[node name="BackButton" type="Button" parent="CenterContainer/Card/Content"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_type_variation = &"SecondaryButton"
 text = "BACK"
+icon = ExtResource("5_resource")
+expand_icon = true

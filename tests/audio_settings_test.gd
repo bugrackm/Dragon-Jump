@@ -139,6 +139,10 @@ func _check_audio_manager() -> void:
 	audio.set_music_enabled(true)
 	_expect(audio.is_music_playing(), "music restarts when re-enabled")
 
+	# Finish startup before measuring real-time waits against tween progress.
+	await process_frame
+	await process_frame
+
 	# Ducking runs while the tree is paused.
 	paused = true
 	audio.duck_music()
