@@ -14,7 +14,6 @@ var _audio_manager: Node
 
 func _ready() -> void:
 	UiFx.wire_press_fx(self)
-	UiFx.idle_bob(find_child("TitleLabel", true, false), 7.0, 2.5)
 	$CenterContainer/VBoxContainer/Card/Content/PlayButton.pressed.connect(
 		func() -> void:
 			_play_sfx(&"sfx_ui_click")

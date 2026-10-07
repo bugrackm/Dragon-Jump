@@ -1,14 +1,22 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/MainMenu.gd" id="1_resource"]
 [ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
-[ext_resource type="SpriteFrames" path="res://assets/sprites/player/dragon_frames.tres" id="3_resource"]
+[ext_resource type="Texture2D" path="res://assets/ui/menu/menu_dragon.png" id="3_resource"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/icon_play.png" id="4_resource"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/icon_shop.png" id="5_resource"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/icon_settings.png" id="6_resource"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/icon_coin.png" id="7_resource"]
 
 [ext_resource type="Script" path="res://scripts/ui/MenuDragon.gd" id="8_dragon"]
+
+[ext_resource type="Texture2D" path="res://assets/ui/menu/menu_logo.png" id="9_logo"]
+[ext_resource type="Script" path="res://scripts/ui/MenuHero.gd" id="10_hero"]
+[ext_resource type="Script" path="res://scripts/ui/MenuSparkles.gd" id="11_sparkles"]
+[ext_resource type="Shader" path="res://assets/shaders/menu_logo_shine.gdshader" id="12_shine"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_shine"]
+shader = ExtResource("12_shine")
 
 [node name="MainMenu" type="CanvasLayer"]
 process_mode = 2
@@ -40,37 +48,45 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="TitleHolder" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 160)
+custom_minimum_size = Vector2(0, 530)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer/TitleHolder"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-theme_type_variation = &"TitleLabel"
-text = "DRAGON JUMP"
-horizontal_alignment = 1
-vertical_alignment = 1
-mouse_filter = 2
+[node name="LogoRoot" type="Node2D" parent="CenterContainer/VBoxContainer/TitleHolder"]
+
+[node name="LogoMotion" type="Node2D" parent="CenterContainer/VBoxContainer/TitleHolder/LogoRoot"]
+
+[node name="MenuLogo" type="Sprite2D" parent="CenterContainer/VBoxContainer/TitleHolder/LogoRoot/LogoMotion"]
+texture_filter = 2
+texture = ExtResource("9_logo")
+scale = Vector2(1.3343023, 1.3343023)
+material = SubResource("ShaderMaterial_shine")
+
+[node name="Sparkles" type="Node2D" parent="CenterContainer/VBoxContainer/TitleHolder/LogoRoot/LogoMotion"]
+script = ExtResource("11_sparkles")
 
 [node name="DragonStage" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 260)
+custom_minimum_size = Vector2(0, 630)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="MenuDragon" type="AnimatedSprite2D" parent="CenterContainer/VBoxContainer/DragonStage"]
-position = Vector2(400, 130)
-scale = Vector2(1.8, 1.8)
-texture_filter = 2
-sprite_frames = ExtResource("3_resource")
-animation = &"glide"
+[node name="DragonRoot" type="Node2D" parent="CenterContainer/VBoxContainer/DragonStage"]
+
+[node name="DragonFloat" type="Node2D" parent="CenterContainer/VBoxContainer/DragonStage/DragonRoot"]
 script = ExtResource("8_dragon")
+
+[node name="DragonHop" type="Node2D" parent="CenterContainer/VBoxContainer/DragonStage/DragonRoot/DragonFloat"]
+
+[node name="MenuDragon" type="Sprite2D" parent="CenterContainer/VBoxContainer/DragonStage/DragonRoot/DragonFloat/DragonHop"]
+texture_filter = 2
+texture = ExtResource("3_resource")
+scale = Vector2(0.8972504, 0.8972504)
 
 [node name="Card" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
 custom_minimum_size = Vector2(800, 0)
 layout_mode = 2
 unique_name_in_owner = true
+size_flags_horizontal = 4
 theme_type_variation = &"Card"
 
 [node name="Content" type="VBoxContainer" parent="CenterContainer/VBoxContainer/Card"]
@@ -129,3 +145,7 @@ layout_mode = 2
 theme_type_variation = &"StatLabel"
 text = "Coins: 0"
 horizontal_alignment = 1
+
+[node name="HeroAnimator" type="Node" parent="."]
+process_mode = 3
+script = ExtResource("10_hero")
