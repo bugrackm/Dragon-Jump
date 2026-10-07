@@ -1,8 +1,77 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/Background.tscn" id="1_background"]
 [ext_resource type="Script" path="res://scripts/ui/MenuBackdrop.gd" id="2_menu"]
+[ext_resource type="Texture2D" path="res://assets/ui/menu/menu_island_1.png" id="3_island"]
+[ext_resource type="Texture2D" path="res://assets/ui/menu/menu_island_2.png" id="4_island"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particles/flame.png" id="5_flame"]
+
+[sub_resource type="Gradient" id="Gradient_glow"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.6, 0.1, 0, 1, 0.62, 0.1, 0.5, 1, 0.32, 0.08, 0.75)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture_glow"]
+gradient = SubResource("Gradient_glow")
+width = 8
+height = 256
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_embers"]
+offsets = PackedFloat32Array(0, 0.15, 0.55, 1)
+colors = PackedColorArray(1, 0.9, 0.35, 0, 1, 0.85, 0.25, 1, 1, 0.55, 0.1, 0.8, 1, 0.35, 0.05, 0)
+
+[sub_resource type="Curve" id="Curve_embers"]
+_data = [Vector2(0, 0.6), 0.0, 0.0, 0, 0, Vector2(0.25, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.35), 0.0, 0.0, 0, 0]
+point_count = 3
 
 [node name="MenuBackdrop" instance=ExtResource("1_background")]
 process_mode = 3
 script = ExtResource("2_menu")
+
+[node name="Atmosphere" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = -99
+
+[node name="FarIsland" type="Sprite2D" parent="Atmosphere"]
+texture_filter = 2
+texture = ExtResource("4_island")
+scale = Vector2(0.65, 0.65)
+modulate = Color(0.84, 0.92, 1, 0.55)
+
+[node name="NearIsland" type="Sprite2D" parent="Atmosphere"]
+texture_filter = 2
+texture = ExtResource("3_island")
+scale = Vector2(0.9, 0.9)
+modulate = Color(1, 1, 1, 0.85)
+
+[node name="FireGlow" type="TextureRect" parent="Atmosphere"]
+texture_filter = 2
+mouse_filter = 2
+texture = SubResource("GradientTexture_glow")
+expand_mode = 1
+
+[node name="Embers" type="CPUParticles2D" parent="Atmosphere"]
+process_mode = 3
+texture_filter = 2
+position = Vector2(540, 1920)
+amount = 50
+lifetime = 4.2
+preprocess = 4.2
+texture = ExtResource("5_flame")
+local_coords = true
+emission_shape = 3
+emission_rect_extents = Vector2(540, 12)
+direction = Vector2(0, -1)
+spread = 14.0
+gravity = Vector2(0, -6)
+initial_velocity_min = 120.0
+initial_velocity_max = 220.0
+angular_velocity_min = -20.0
+angular_velocity_max = 20.0
+tangential_accel_min = -18.0
+tangential_accel_max = 18.0
+scale_amount_min = 0.3
+scale_amount_max = 0.6
+scale_amount_curve = SubResource("Curve_embers")
+color_ramp = SubResource("Gradient_embers")
