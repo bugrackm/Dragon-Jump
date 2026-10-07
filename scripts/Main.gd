@@ -175,6 +175,7 @@ func _ensure_main_menu() -> void:
 
 
 func _show_main_menu() -> void:
+	get_tree().paused = true
 	hud.set_stats_visible(false)
 	if not is_instance_valid(_menu_backdrop):
 		_menu_backdrop = MENU_BACKDROP_SCENE.instantiate() as ParallaxBackground
@@ -182,6 +183,7 @@ func _show_main_menu() -> void:
 	_ensure_main_menu()
 	_main_menu.call("refresh", profile_store)
 	UiFx.open_screen(_main_menu)
+	_main_menu.get_node("HeroAnimator").open()
 
 
 func _start_game() -> void:
