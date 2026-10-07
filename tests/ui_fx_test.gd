@@ -42,9 +42,9 @@ func _run() -> void:
 	var backdrop: ParallaxBackground = main._menu_backdrop
 	_expect(is_instance_valid(backdrop), "menu backdrop exists")
 	_expect(main.find_children("*", "ParallaxBackground", true, false).size() == 1, "one menu parallax")
-	var dragon := main._main_menu.find_child("MenuDragon", true, false) as AnimatedSprite2D
-	_expect(dragon.sprite_frames == load("res://assets/sprites/player/dragon_frames.tres"), "menu shares dragon frames")
-	_expect(dragon.is_playing(), "menu dragon animates")
+	var dragon := main._main_menu.find_child("MenuDragon", true, false) as Sprite2D
+	_expect(dragon.texture == load("res://assets/ui/menu/menu_dragon.png"), "menu uses splash dragon")
+	_expect(not dragon.flip_h, "menu dragon faces right")
 	_expect(not main.hud.get_node("MarginContainer/Rows").visible, "menu hides HUD stats")
 	await _check_living_menu(main._main_menu, dragon)
 	var play: Button = main._main_menu.get_node("%Card").get_node("Content/PlayButton")
@@ -171,28 +171,19 @@ func _check_theme() -> void:
 		_expect(theme.get_icon(name, "HSlider") is ImageTexture, "embedded slider " + name)
 
 
-func _check_living_menu(menu: CanvasLayer, dragon: AnimatedSprite2D) -> void:
-	await process_frame
-	await process_frame
-	var title := menu.find_child("TitleLabel", true, false) as Control
-	var original_position := title.position
-	var dragon_position := dragon.position
+func _check_living_menu(menu: CanvasLayer, dragon: Sprite2D) -> void:
+	await create_timer(1.0).timeout
+	var title := menu.find_child("LogoMotion", true, false) as Node2D
+	var motion := dragon.get_parent().get_parent() as Node2D
 	for tree_paused in [false, true]:
 		paused = tree_paused
+		var original_position := title.position
+		var dragon_position := motion.position
 		await create_timer(0.15).timeout
 		_expect(not title.position.is_equal_approx(original_position), "title bobs paused=%s" % tree_paused)
 		_expect(not title.scale.is_equal_approx(Vector2.ONE), "title breathes paused=%s" % tree_paused)
-		_expect(not dragon.position.is_equal_approx(dragon_position), "dragon travels paused=%s" % tree_paused)
-	# Advance to both turns and the flap boundary without waiting a whole flight cycle.
-	dragon._elapsed = 3.0
-	dragon._flap_clock = 2.99
-	dragon._process(0.02)
-	_expect(dragon.flip_h and dragon.animation == &"double_jump", "dragon turns and flaps")
-	await create_timer(0.3).timeout
-	_expect(dragon.animation == &"glide" and dragon.is_playing(), "flap returns to glide while paused")
-	dragon._elapsed = 7.0
-	dragon._process(0.02)
-	_expect(not dragon.flip_h, "dragon turns back")
+		_expect(not motion.position.is_equal_approx(dragon_position), "dragon travels paused=%s" % tree_paused)
+		_expect(not dragon.flip_h, "dragon never flips paused=%s" % tree_paused)
 	paused = false
 
 

@@ -85,6 +85,10 @@ func _check_ui() -> void:
 		[2400, Vector4(60, 140, 80, 100)],
 		[2400, Vector4.ZERO],
 		[1920, Vector4(0, 140, 0, 100)],
+		[2340, Vector4.ZERO],
+		[2520, Vector4(30, 60, 30, 30)],
+		[1600, Vector4(0, 40, 0, 40)],
+		[1440, Vector4.ZERO],
 	]:
 		viewport.size = Vector2i(1080, case[0])
 		var insets: Vector4 = case[1]
@@ -114,6 +118,8 @@ func _check_ui() -> void:
 			_expect(menu.get_node("Background").get_global_rect().is_equal_approx(
 				Rect2(Vector2.ZERO, Vector2(viewport.size))), "full bleed " + menu.name)
 			_expect(safe_rect.encloses((menu.get_node("%Card") as Control).get_global_rect()), "safe Card " + menu.name)
+			if menu.name == "MainMenu":
+				_check_hero_layout(menu, safe_rect, Rect2(Vector2.ZERO, Vector2(viewport.size)))
 			var content := menu.get_node("%Card/Content") as Control
 			if menu.name == "SettingsMenu":
 				var label_x := -1.0
@@ -142,7 +148,7 @@ func _check_ui() -> void:
 			for button in menu.find_children("*", "BaseButton"):
 				_expect(button.size.y >= 72, "menu touch target " + menu.name + "/" + button.name)
 				_expect(safe_rect.encloses(button.get_global_rect()), "safe menu button " + menu.name + "/" + button.name)
-	_expect(changes[0] == 4, "override changes emit once each")
+	_expect(changes[0] == 8, "override changes emit once each")
 	_layout.debug_insets_override = Vector4(-10, 120, -20, 90)
 	_expect(_layout.safe_insets == Vector4(0, 120, 0, 90), "debug insets clamp nonnegative")
 	_layout.layout_changed.disconnect(on_change)
@@ -213,3 +219,39 @@ func _sample_sky() -> void:
 	var clear: Color = ProjectSettings.get_setting("rendering/environment/defaults/default_clear_color")
 	_expect(absf(clear.r - sample.r) < 0.001 and absf(clear.g - sample.g) < 0.001
 		and absf(clear.b - sample.b) < 0.001, "clear color matches sky top")
+
+
+func _check_hero_layout(menu: CanvasLayer, safe_rect: Rect2, screen: Rect2) -> void:
+	var hero := menu.get_node("HeroAnimator")
+	var logo: Sprite2D = hero.logo
+	var card: Control = hero.card
+	var stage: Control = hero.dragon_stage
+	var logo_rect := _sprite_rect(logo)
+	var card_rect := card.get_global_rect()
+	_expect(screen.encloses(logo_rect), "menu logo inside viewport %s" % screen.size)
+	_expect(screen.encloses(stage.get_global_rect()), "dragon stage inside viewport %s" % screen.size)
+	_expect(screen.encloses(card_rect), "menu Card inside viewport")
+	_expect(safe_rect.encloses(card_rect), "hero leaves Card inside safe rect")
+	_expect(not logo_rect.intersects(card_rect), "logo does not overlap Card")
+	_expect(not stage.get_global_rect().intersects(card_rect), "dragon stage does not overlap Card")
+	_expect(hero.hero_scale >= 0.6, "hero minimum scale")
+	if screen.size.y <= 1920 and safe_rect.size.y < 1800:
+		_expect(hero.hero_scale < 1.0, "short screens shrink hero")
+	var dragon := menu.find_child("MenuDragon", true, false) as Sprite2D
+	var motion: Node2D = hero.dragon
+	var pose := motion.transform
+	var hop_pose: Transform2D = motion.hop.transform
+	var contained := true
+	var clear_of_logo := true
+	var clear_of_card := true
+	for frame in 480:
+		motion.apply_pose(frame / 60.0)
+		var rect := _sprite_rect(dragon)
+		contained = contained and screen.encloses(rect)
+		clear_of_logo = clear_of_logo and not rect.intersects(logo_rect)
+		clear_of_card = clear_of_card and not rect.intersects(card_rect)
+	_expect(contained, "moving dragon stays inside viewport")
+	_expect(clear_of_logo, "hopping dragon clears logo")
+	_expect(clear_of_card, "moving dragon clears Card")
+	motion.transform = pose
+	motion.hop.transform = hop_pose
