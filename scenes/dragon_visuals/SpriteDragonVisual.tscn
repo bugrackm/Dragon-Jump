@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/dragon_visual/SpriteDragonVisual.gd" id="1_visual"]
+[ext_resource type="SpriteFrames" path="res://assets/sprites/player/dragon_frames.tres" id="2_frames"]
+
+[node name="SpriteDragonVisual" type="AnimatedSprite2D"]
+texture_filter = 2
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+script = ExtResource("1_visual")

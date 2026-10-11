@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/Player.gd" id="1_player"]
 [ext_resource type="Script" path="res://scripts/InputController.gd" id="2_input"]
@@ -7,7 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/effects/GlideTrail.tscn" id="16_glide_trail"]
 [ext_resource type="PackedScene" path="res://scenes/effects/MouthFlame.tscn" id="17_mouth_flame"]
 
-[ext_resource type="SpriteFrames" path="res://assets/sprites/player/dragon_frames.tres" id="18_frames"]
+[ext_resource type="PackedScene" path="res://scenes/dragon_visuals/SpriteDragonVisual.tscn" id="18_visual"]
+[ext_resource type="Script" path="res://scripts/dragon_visual/DragonVisualHost.gd" id="19_visual_host"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 34.0
@@ -37,11 +38,9 @@ position = Vector2(0, -46)
 z_index = 1
 
 [node name="VisualRoot" type="Node2D" parent="."]
+script = ExtResource("19_visual_host")
 
-[node name="Sprite" type="AnimatedSprite2D" parent="VisualRoot"]
-texture_filter = 2
-sprite_frames = ExtResource("18_frames")
-animation = &"idle"
+[node name="Sprite" parent="VisualRoot" instance=ExtResource("18_visual")]
 
 [node name="AnimationController" type="Node" parent="."]
 script = ExtResource("4_animation_controller")
