@@ -101,6 +101,10 @@ func _physics_process(delta: float) -> void:
 	animation_controller.call("update_animation", animation_is_gliding)
 
 
+func apply_skin(skin: Resource) -> void:
+	$VisualRoot.apply_skin(skin)
+
+
 func configure_abilities(double_jump: bool, glide: bool, fire_level: int) -> void:
 	double_jump_enabled = double_jump
 	glide_enabled = glide
