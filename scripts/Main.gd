@@ -25,6 +25,8 @@ var _settings_menu: CanvasLayer
 var _pause_overlay: CanvasLayer
 var _shop_screen: CanvasLayer
 var _settings_return_to_pause := false
+var _quit_requested := false
+var _suppress_quit := false ## Test hook: record quit without exiting.
 
 var _current_world: Node2D
 var _platform_manager
@@ -62,6 +64,8 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		_quit_cleanly()
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_handle_back()
 
 
 ## Stops audio and lets the audio server drop its playbacks before quitting,
@@ -87,23 +91,35 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.keycode != KEY_ESCAPE or not event.pressed or event.echo:
 		return
+	if _handle_back():
+		get_viewport().set_input_as_handled()
+
+
+## Shared by ESC and the Android system Back button. Returns true if handled.
+func _handle_back() -> bool:
 	if _is_open(_shop_screen):
 		_hide_shop()
-		get_viewport().set_input_as_handled()
-		return
-
+		return true
 	if _is_open(_settings_menu):
 		_hide_settings()
-		get_viewport().set_input_as_handled()
-		return
-
+		return true
 	if run_session.state == run_session.RunState.PLAYING:
 		_pause_game()
-	elif run_session.state == run_session.RunState.PAUSED:
+		return true
+	if run_session.state == run_session.RunState.PAUSED:
 		_resume_game()
-	else:
-		return
-	get_viewport().set_input_as_handled()
+		return true
+	if run_session.state == run_session.RunState.GAME_OVER:
+		if _is_open(_game_over_screen):
+			_quit_to_menu()
+			return true
+		return false
+	if run_session.state == run_session.RunState.READY and _is_open(_main_menu):
+		_quit_requested = true
+		if not _suppress_quit:
+			_quit_cleanly()
+		return true
+	return false
 
 
 func _physics_process(delta: float) -> void:
