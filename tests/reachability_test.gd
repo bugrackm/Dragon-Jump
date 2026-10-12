@@ -220,7 +220,7 @@ func _check_world_and_fire() -> void:
 	for index in range(9):
 		_expect(initial_layout[index][1] == &"static", "safe platform %d" % index)
 	_expect(fire.speed_model == 2 and fire.visible_band == 70.0 and fire.rise_speed_min == 90.0 and fire.rise_speed_max == 170.0
-		and fire.leash_below_screen == 40.0 and fire.kill_inset == 24.0 and fire.activation_margin == 40.0, "fire export defaults")
+		and fire.leash_below_screen == 40.0 and fire.kill_inset == 12.0 and fire.activation_margin == 40.0, "fire export defaults")
 	var jump_height: float = PLAYER_SCRIPT.JUMP_VELOCITY * PLAYER_SCRIPT.JUMP_VELOCITY / (2.0 * PLAYER_SCRIPT.GRAVITY)
 	var inactive_y: float = fire.fire_top_y
 	player.position.y = 1722.0 - jump_height
