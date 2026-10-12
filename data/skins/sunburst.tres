@@ -1,0 +1,15 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/cosmetics/SkinDef.gd" id="1_skin"]
+
+[resource]
+script = ExtResource("1_skin")
+id = "sunburst"
+display_name = "Sunburst"
+price = 1500
+unlock = "coins"
+sort_order = 4
+use_tint = true
+hue_target = 45.0
+sat_mul = 1.1
+val_mul = 1.1
