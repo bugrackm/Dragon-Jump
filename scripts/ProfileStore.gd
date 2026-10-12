@@ -1,20 +1,25 @@
 class_name ProfileStore
 extends Node
 
-## Stores persistent score, wallet, settings, and ability unlock data.
+## Stores persistent score, wallet, settings, ability unlock, and cosmetics data.
 
 signal high_score_changed(new_high_score: int)
 signal coins_changed(new_total: int)
 signal settings_changed(key: String, value: Variant)
 signal ability_unlocked(ability_key: String)
 signal ability_upgraded(ability_key: String, new_level: int)
+signal skin_purchased(skin_id: String)
+signal skin_equipped(skin_id: String)
 
+const SkinCatalog := preload("res://scripts/cosmetics/SkinCatalog.gd")
 const SAVE_PATH := "user://profile.cfg"
-const CURRENT_SCHEMA_VERSION := 4
+const CURRENT_SCHEMA_VERSION := 5
+const ABILITY_GRANT_BELOW_SCHEMA := 4
 const SECTION_PROFILE := "profile"
 const SECTION_ECONOMY := "economy"
 const SECTION_SETTINGS := "settings"
 const SECTION_ABILITIES := "abilities"
+const SECTION_COSMETICS := "cosmetics"
 
 const DEFAULT_SFX_VOLUME := 1.0
 const DEFAULT_MUSIC_VOLUME := 0.6
@@ -35,6 +40,8 @@ var double_jump_unlocked := false
 var glide_unlocked := false
 var fire_breath_level := 1
 var schema_version := CURRENT_SCHEMA_VERSION
+var _owned_skins := PackedStringArray([SkinCatalog.DEFAULT_ID])
+var _equipped_skin := SkinCatalog.DEFAULT_ID
 
 
 func _ready() -> void:
@@ -151,9 +158,9 @@ func load_profile() -> void:
 		and int(loaded_fire_level) <= MAX_FIRE_BREATH_LEVEL
 	)
 
-	if loaded_schema_version < CURRENT_SCHEMA_VERSION:
+	if loaded_schema_version < ABILITY_GRANT_BELOW_SCHEMA:
 		# Before M3b these abilities were always available, so existing players
-		# retain them when their legacy profile is upgraded to schema v4.
+		# retain them when their pre-v4 profile is upgraded.
 		double_jump_unlocked = true
 		glide_unlocked = true
 		fire_breath_level = 1
@@ -162,6 +169,38 @@ func load_profile() -> void:
 		glide_unlocked = loaded_glide if glide_is_valid else false
 		fire_breath_level = clampi(int(loaded_fire_level), 1, MAX_FIRE_BREATH_LEVEL) \
 			if fire_level_is_valid else 1
+
+	var loaded_owned_skins: Variant = config.get_value(
+		SECTION_COSMETICS,
+		"owned_skins",
+		PackedStringArray([SkinCatalog.DEFAULT_ID])
+	)
+	var loaded_equipped_skin: Variant = config.get_value(
+		SECTION_COSMETICS,
+		"equipped_skin",
+		SkinCatalog.DEFAULT_ID
+	)
+	var owned_skins_are_valid := (
+		typeof(loaded_owned_skins) == TYPE_ARRAY
+		or typeof(loaded_owned_skins) == TYPE_PACKED_STRING_ARRAY
+	)
+	_owned_skins = PackedStringArray()
+	if loaded_schema_version >= 5 and owned_skins_are_valid:
+		for entry in loaded_owned_skins:
+			if typeof(entry) != TYPE_STRING or _owned_skins.has(entry):
+				owned_skins_are_valid = false
+				continue
+			_owned_skins.append(entry)
+	if not _owned_skins.has(SkinCatalog.DEFAULT_ID):
+		_owned_skins.append(SkinCatalog.DEFAULT_ID)
+		owned_skins_are_valid = false
+	var equipped_skin_is_valid := (
+		typeof(loaded_equipped_skin) == TYPE_STRING
+		and _owned_skins.has(loaded_equipped_skin)
+		and SkinCatalog.has_skin(loaded_equipped_skin)
+	)
+	_equipped_skin = loaded_equipped_skin \
+		if loaded_schema_version >= 5 and equipped_skin_is_valid else SkinCatalog.DEFAULT_ID
 
 	schema_version = loaded_schema_version if is_future_schema else CURRENT_SCHEMA_VERSION
 	if is_future_schema:
@@ -199,6 +238,10 @@ func load_profile() -> void:
 		or double_jump_missing
 		or glide_missing
 		or fire_level_missing
+		or not config.has_section_key(SECTION_COSMETICS, "owned_skins")
+		or not config.has_section_key(SECTION_COSMETICS, "equipped_skin")
+		or not owned_skins_are_valid
+		or not equipped_skin_is_valid
 		or not high_score_is_valid
 		or not coins_are_valid
 		or not sound_is_valid
@@ -356,6 +399,55 @@ func upgrade_fire_breath() -> bool:
 	return true
 
 
+func get_owned_skins() -> PackedStringArray:
+	return _owned_skins.duplicate()
+
+
+func is_skin_owned(id: String) -> bool:
+	return _owned_skins.has(id)
+
+
+func get_equipped_skin_id() -> String:
+	return _equipped_skin
+
+
+func purchase_skin(id: String) -> bool:
+	if not SkinCatalog.has_skin(id) or is_skin_owned(id):
+		return false
+	var skin: Resource = SkinCatalog.get_skin(id)
+	if skin.unlock != "coins" or total_coins < skin.price:
+		return false
+
+	var old_total_coins := total_coins
+	var old_owned_skins := _owned_skins.duplicate()
+	total_coins -= skin.price
+	_owned_skins.append(id)
+	if not save_profile():
+		total_coins = old_total_coins
+		_owned_skins = old_owned_skins
+		return false
+
+	coins_changed.emit(total_coins)
+	skin_purchased.emit(id)
+	return true
+
+
+func equip_skin(id: String) -> bool:
+	if not is_skin_owned(id) or not SkinCatalog.has_skin(id):
+		return false
+	if _equipped_skin == id:
+		return true
+
+	var old_equipped_skin := _equipped_skin
+	_equipped_skin = id
+	if not save_profile():
+		_equipped_skin = old_equipped_skin
+		return false
+
+	skin_equipped.emit(id)
+	return true
+
+
 func save_profile() -> bool:
 	if schema_version > CURRENT_SCHEMA_VERSION:
 		push_warning("Refusing to overwrite a profile created by a newer schema.")
@@ -372,6 +464,8 @@ func save_profile() -> bool:
 	config.set_value(SECTION_ABILITIES, "double_jump_unlocked", double_jump_unlocked)
 	config.set_value(SECTION_ABILITIES, "glide_unlocked", glide_unlocked)
 	config.set_value(SECTION_ABILITIES, "fire_breath_level", fire_breath_level)
+	config.set_value(SECTION_COSMETICS, "owned_skins", _owned_skins)
+	config.set_value(SECTION_COSMETICS, "equipped_skin", _equipped_skin)
 
 	var error := config.save(SAVE_PATH)
 	if error != OK:
@@ -391,6 +485,8 @@ func _reset_to_defaults() -> void:
 	double_jump_unlocked = false
 	glide_unlocked = false
 	fire_breath_level = 1
+	_owned_skins = PackedStringArray([SkinCatalog.DEFAULT_ID])
+	_equipped_skin = SkinCatalog.DEFAULT_ID
 
 
 func _is_valid_volume(value: Variant) -> bool:
