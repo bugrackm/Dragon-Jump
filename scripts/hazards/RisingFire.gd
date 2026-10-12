@@ -11,7 +11,7 @@ enum SpeedModel { RUBBER_BAND, CONSTANT, SCREEN_BAND }
 @export var leash_below_screen := 40.0
 ## SCREEN_BAND: how far the fire top sits above the screen bottom (world units).
 @export var visible_band := 70.0
-@export var kill_inset := 24.0
+@export var kill_inset := 12.0
 @export var activation_margin := 40.0
 
 var fire_top_y := 2340.0
@@ -21,8 +21,17 @@ var _activation_y := 0.0
 var _difficulty := 0.0
 var _active := false
 var _stopped := true
+var _visual_time := 0.0
 
 @onready var _flames: CPUParticles2D = $Flames
+@onready var _wall_material: ShaderMaterial = $Body.material
+
+
+func _process(delta: float) -> void:
+	if not visible or _stopped:
+		return
+	_visual_time += delta
+	_wall_material.set_shader_parameter("u_time", _visual_time)
 
 
 func setup(camera: Camera2D, player: Node2D, ground_top_y: float, jump_height: float) -> void:

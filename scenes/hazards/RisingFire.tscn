@@ -1,22 +1,37 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/hazards/RisingFire.gd" id="1_fire"]
-[ext_resource type="Texture2D" path="res://assets/sprites/particles/flame.png" id="2_flame"]
+[ext_resource type="Texture2D" path="res://assets/sprites/particles/ember_flake.png" id="2_ember"]
+[ext_resource type="Shader" path="res://assets/shaders/fire_wall.gdshader" id="3_wall"]
 
-[sub_resource type="Gradient" id="Gradient_body"]
-offsets = PackedFloat32Array(0, 0.008, 0.07, 0.3, 1)
-colors = PackedColorArray(1, 0.8, 0.15, 0, 1, 0.8, 0.15, 1, 1, 0.3, 0.025, 1, 0.48, 0.035, 0.01, 1, 0.06, 0.008, 0.005, 1)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wall"]
+resource_local_to_scene = true
+shader = ExtResource("3_wall")
+shader_parameter/u_time = 0.0
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_body"]
-gradient = SubResource("Gradient_body")
+[sub_resource type="Gradient" id="Gradient_haze"]
+offsets = PackedFloat32Array(0, 0.30, 0.60, 1)
+colors = PackedColorArray(1, 0.38, 0.48, 0, 1, 0.30, 0.42, 0.13, 1, 0.34, 0.04, 0.40, 1, 0.52, 0.10, 0.42)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_haze"]
+gradient = SubResource("Gradient_haze")
 width = 8
-height = 512
+height = 256
 fill_from = Vector2(0, 0)
 fill_to = Vector2(0, 1)
 
-[sub_resource type="Gradient" id="Gradient_flames"]
-offsets = PackedFloat32Array(0, 0.6, 1)
-colors = PackedColorArray(1, 0.9, 0.5, 1, 1, 0.5, 0.1, 0.85, 1, 0.18, 0.025, 0)
+[sub_resource type="Gradient" id="Gradient_embers"]
+offsets = PackedFloat32Array(0, 0.1, 0.55, 1)
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0.95, 1, 1, 1, 0)
+
+[sub_resource type="Curve" id="Curve_drift"]
+_limits = [-1.0, 1.0, 0.0, 1.0]
+_data = [Vector2(0, 0.6), 0.0, 0.0, 0, 0, Vector2(0.3, -0.7), 0.0, 0.0, 0, 0, Vector2(0.65, 0.8), 0.0, 0.0, 0, 0, Vector2(1, -0.4), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="Curve" id="Curve_scale"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.70), 0.0, 0.0, 0, 0]
+point_count = 3
 
 [node name="RisingFire" type="Node2D"]
 process_mode = 1
@@ -25,29 +40,41 @@ position = Vector2(0, 2340)
 z_index = 10
 script = ExtResource("1_fire")
 
-[node name="Body" type="Sprite2D" parent="."]
+[node name="Haze" type="Sprite2D" parent="."]
 texture_filter = 2
-position = Vector2(-200, 0)
-scale = Vector2(185, 4.296875)
-texture = SubResource("GradientTexture2D_body")
+position = Vector2(-200, -250)
+scale = Vector2(185, 1.015625)
+texture = SubResource("GradientTexture2D_haze")
 centered = false
+
+[node name="Body" type="Polygon2D" parent="."]
+material = SubResource("ShaderMaterial_wall")
+polygon = PackedVector2Array(-200, -112, 1280, -112, 1280, 2200, -200, 2200)
 
 [node name="Flames" type="CPUParticles2D" parent="."]
 texture_filter = 2
-position = Vector2(540, 14)
+position = Vector2(540, -12)
 emitting = false
-amount = 36
-texture = ExtResource("2_flame")
-lifetime = 0.9
-preprocess = 0.9
+amount = 18
+texture = ExtResource("2_ember")
+lifetime = 2.5
+preprocess = 2.5
 local_coords = true
 emission_shape = 3
 emission_rect_extents = Vector2(740, 8)
 direction = Vector2(0, -1)
-spread = 12.0
-gravity = Vector2(0, -50)
-initial_velocity_min = 65.0
-initial_velocity_max = 140.0
-scale_amount_min = 0.65
-scale_amount_max = 1.15
-color_ramp = SubResource("Gradient_flames")
+spread = 10.0
+gravity = Vector2(0, -8)
+initial_velocity_min = 80.0
+initial_velocity_max = 125.0
+angular_velocity_min = -28.0
+angular_velocity_max = 28.0
+angle_min = -35.0
+angle_max = 35.0
+tangential_accel_min = 9.0
+tangential_accel_max = 16.0
+tangential_accel_curve = SubResource("Curve_drift")
+scale_amount_min = 0.48
+scale_amount_max = 0.70
+scale_amount_curve = SubResource("Curve_scale")
+color_ramp = SubResource("Gradient_embers")
