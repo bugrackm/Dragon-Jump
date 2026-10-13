@@ -85,7 +85,7 @@ func _expect_defaults(store: ProfileStore, description: String) -> void:
 func _check_catalog() -> void:
 	var expected_ids := PackedStringArray(["classic", "ember", "frost", "amethyst", "sunburst", "obsidian"])
 	var prices := [0, 500, 500, 750, 1500, 2000]
-	var hues := [0.0, 8.0, 195.0, 275.0, 45.0, 230.0]
+	var hues := [0.0, 8.0, 195.0, 275.0, 44.0, 230.0]
 	var types := {
 		"id": TYPE_STRING, "display_name": TYPE_STRING, "price": TYPE_INT,
 		"unlock": TYPE_STRING, "sort_order": TYPE_INT, "icon_path": TYPE_STRING,
@@ -118,11 +118,11 @@ func _check_catalog() -> void:
 		_expect(skin.use_tint == (index != 0), "tint enabled only on shop skins")
 		_expect(index == 0 or skin.price > 0, "shop price is positive")
 		_expect(is_equal_approx(skin.hue_target, hues[index]), "target hue")
-		_expect(is_equal_approx(skin.hue_center, 112.0), "default hue center")
-		_expect(is_equal_approx(skin.hue_half_width, 40.0), "default hue half width")
-		_expect(is_equal_approx(skin.softness, 12.0), "default softness")
+		_expect(is_equal_approx(skin.hue_center, 115.0), "default hue center")
+		_expect(is_equal_approx(skin.hue_half_width, 35.0), "default hue half width")
+		_expect(is_equal_approx(skin.softness, 15.0), "default softness")
 		_expect(is_equal_approx(skin.sat_gate, 0.35), "default saturation gate")
-		var expected_sat := 0.35 if skin.id == "obsidian" else (1.1 if skin.id == "sunburst" else 1.0)
+		var expected_sat := 0.35 if skin.id == "obsidian" else (1.15 if skin.id == "sunburst" else 1.0)
 		var expected_val := 0.45 if skin.id == "obsidian" else (1.1 if skin.id == "sunburst" else 1.0)
 		_expect(is_equal_approx(skin.sat_mul, expected_sat), "saturation multiplier")
 		_expect(is_equal_approx(skin.val_mul, expected_val), "value multiplier")
