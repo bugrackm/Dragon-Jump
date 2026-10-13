@@ -1,6 +1,6 @@
 extends Node2D
 
-## Owns the current visual. Future skin resources may supply a visual_scene PackedScene.
+## Owns the current visual. Skins may supply a visual_scene PackedScene or an optional visual_scene_path.
 
 signal visual_changed(visual: Node)
 
@@ -17,6 +17,10 @@ func apply_skin(skin: Resource) -> void:
 	var visual_scene: PackedScene
 	if skin != null and "visual_scene" in skin:
 		visual_scene = skin.get("visual_scene") as PackedScene
+	elif skin != null and "visual_scene_path" in skin:
+		var scene_path: String = skin.get("visual_scene_path")
+		if not scene_path.is_empty():
+			visual_scene = load(scene_path) as PackedScene
 	if visual_scene != null and visual_scene != _visual_scene:
 		var next_visual := visual_scene.instantiate()
 		remove_child(_visual)

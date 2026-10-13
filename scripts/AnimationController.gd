@@ -24,6 +24,8 @@ func _bind_visual(visual: Node) -> void:
 		_visual.one_shot_finished.disconnect(_on_one_shot_finished)
 	_visual = visual
 	_visual.one_shot_finished.connect(_on_one_shot_finished)
+	_current_locomotion = &""
+	_one_shot_override = &""
 
 
 func trigger_fire() -> void:
