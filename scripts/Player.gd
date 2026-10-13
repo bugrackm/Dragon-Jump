@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 ## Dragon controller: automatic jumping, steering, double jump, and glide.
 
+signal landed(collider: Object)
+
 const GRAVITY := 2400.0
 const JUMP_VELOCITY := -1150.0
 const MOVE_SPEED := 520.0
@@ -156,6 +158,7 @@ func _apply_platform_landing() -> void:
 			var platform := collision.get_collider()
 			if platform and platform.has_method("on_player_landed"):
 				platform.call("on_player_landed", self)
+			landed.emit(platform)
 			break
 
 	# Spring platforms set a negative velocity above. Every other landing keeps

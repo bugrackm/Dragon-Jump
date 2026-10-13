@@ -178,7 +178,10 @@ func _check_fire_and_camera() -> void:
 	player.position.y = 1000.0
 	player.velocity = Vector2.ZERO
 	fire._physics_process(0.0)
-	_expect(fire.is_active(), "fire active after leaving ground")
+	_expect(not fire.is_active(), "height alone does not start the fire")
+	fire.notify_platform_landing()
+	fire._physics_process(0.0)
+	_expect(fire.is_active(), "fire active after first platform landing")
 	player.position.y = camera.position.y + 10.0
 
 	var before := camera.position.y
@@ -229,12 +232,15 @@ func _check_fire_and_camera() -> void:
 	fire = main._rising_fire
 	camera = main._camera
 	_expect(is_equal_approx(camera.position.y, start_y) and is_equal_approx(main._highest_camera_y, start_y), "retry resets camera")
-	_expect(not fire.is_active(), "retry: fire inactive until player leaves ground")
+	_expect(not fire.is_active(), "retry: fire inactive until first platform landing")
 	main._physics_process(1.0)
 	_expect(is_equal_approx(camera.position.y, start_y), "retry: no auto-scroll before activation")
 	player.position.y = 1000.0
 	fire._physics_process(0.0)
-	_expect(fire.is_active(), "retry: fire activates after leaving ground")
+	_expect(not fire.is_active(), "retry: landing state was reset")
+	fire.notify_platform_landing()
+	fire._physics_process(0.0)
+	_expect(fire.is_active(), "retry: fire activates after first platform landing")
 
 	# Pause gating.
 	player.position.y = camera.position.y + 10.0

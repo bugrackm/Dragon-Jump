@@ -220,18 +220,19 @@ func _check_world_and_fire() -> void:
 	for index in range(9):
 		_expect(initial_layout[index][1] == &"static", "safe platform %d" % index)
 	_expect(fire.speed_model == 2 and fire.visible_band == 70.0 and fire.rise_speed_min == 90.0 and fire.rise_speed_max == 170.0
-		and fire.leash_below_screen == 40.0 and fire.kill_inset == 12.0 and fire.activation_margin == 40.0, "fire export defaults")
+		and fire.leash_below_screen == 40.0 and fire.kill_inset == 12.0, "fire export defaults")
 	var jump_height: float = PLAYER_SCRIPT.JUMP_VELOCITY * PLAYER_SCRIPT.JUMP_VELOCITY / (2.0 * PLAYER_SCRIPT.GRAVITY)
 	var inactive_y: float = fire.fire_top_y
 	player.position.y = 1722.0 - jump_height
 	fire._physics_process(30.0)
 	_expect(fire.fire_top_y == inactive_y and not fire.visible, "ground-only jump never activates")
-	# Vector2 coordinates are float32; round up so this is truly above the
-	# inactive side of the float64 threshold rather than a fraction below it.
-	player.position.y = ceilf(1722.0 - (jump_height + fire.activation_margin))
+	player.position.y = 1722.0 - 3.0 * jump_height
 	fire._physics_process(1.0)
-	_expect(fire.fire_top_y == inactive_y, "above activation threshold stays inactive")
-	player.position.y -= 1.0
+	_expect(fire.fire_top_y == inactive_y and not fire.visible, "height alone never activates")
+	player.landed.emit(ground)
+	fire._physics_process(1.0)
+	_expect(fire.fire_top_y == inactive_y and not fire.visible, "ground landing never activates")
+	player.landed.emit(main._platform_manager.get("_platforms")[0])
 	fire._physics_process(0.0)
 	var leash_y: float = _screen_layout.visible_bottom(camera.position.y) + fire.leash_below_screen
 	_expect(fire.fire_top_y == leash_y and fire.visible, "activation starts at leash")
