@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/ShopScreen.gd" id="1_resource"]
 [ext_resource type="Script" path="res://scripts/ui/SafeAreaMargin.gd" id="2_resource"]
@@ -7,6 +7,11 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_glide_a.png" id="5_resource"]
 [ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_fire.png" id="6_resource"]
 [ext_resource type="Texture2D" path="res://assets/ui/icons/icon_back.png" id="7_resource"]
+
+[ext_resource type="PackedScene" path="res://scenes/dragon_visuals/SpriteDragonVisual.tscn" id="8_preview"]
+[ext_resource type="Script" path="res://scripts/ui/SkinScroll.gd" id="9_scroll"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_tabs"]
 
 [node name="ShopScreen" type="CanvasLayer"]
 process_mode = 3
@@ -33,31 +38,69 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_resource")
 
-[node name="Card" type="PanelContainer" parent="CenterContainer"]
+[node name="Stack" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="PreviewCard" type="PanelContainer" parent="CenterContainer/Stack"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(920, 0)
+layout_mode = 2
+theme_type_variation = &"Card"
+
+[node name="PreviewContent" type="VBoxContainer" parent="CenterContainer/Stack/PreviewCard"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PreviewStage" type="Control" parent="CenterContainer/Stack/PreviewCard/PreviewContent"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+clip_contents = true
+mouse_filter = 2
+
+[node name="PreviewDragon" parent="CenterContainer/Stack/PreviewCard/PreviewContent/PreviewStage" instance=ExtResource("8_preview")]
+unique_name_in_owner = true
+
+[node name="PreviewNameLabel" type="Label" parent="CenterContainer/Stack/PreviewCard/PreviewContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ShopNameLabel"
+text = "Classic"
+horizontal_alignment = 1
+
+[node name="PreviewStatusLabel" type="Label" parent="CenterContainer/Stack/PreviewCard/PreviewContent"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ShopNameLabel"
+text = "EQUIPPED"
+horizontal_alignment = 1
+
+[node name="Card" type="PanelContainer" parent="CenterContainer/Stack"]
 custom_minimum_size = Vector2(920, 0)
 layout_mode = 2
 unique_name_in_owner = true
 theme_type_variation = &"Card"
 
-[node name="Content" type="VBoxContainer" parent="CenterContainer/Card"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/Stack/Card"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/Card/Content"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/Stack/Card/Content"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"
 text = "SHOP"
 horizontal_alignment = 1
 
 
-[node name="CoinRow" type="HBoxContainer" parent="CenterContainer/Card/Content"]
+[node name="CoinRow" type="HBoxContainer" parent="CenterContainer/Stack/Card/Content"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 12
 
-[node name="CoinIcon" type="TextureRect" parent="CenterContainer/Card/Content/CoinRow"]
+[node name="CoinIcon" type="TextureRect" parent="CenterContainer/Stack/Card/Content/CoinRow"]
 custom_minimum_size = Vector2(48, 48)
 layout_mode = 2
 size_flags_vertical = 4
@@ -66,24 +109,62 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 
-[node name="CoinLabel" type="Label" parent="CenterContainer/Card/Content/CoinRow"]
+[node name="CoinLabel" type="Label" parent="CenterContainer/Stack/Card/Content/CoinRow"]
 layout_mode = 2
 theme_type_variation = &"StatLabel"
 text = "Coins: 0"
 horizontal_alignment = 1
 
 
-[node name="DoubleJumpRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+[node name="TabRow" type="HBoxContainer" parent="CenterContainer/Stack/Card/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="AbilitiesTab" type="Button" parent="CenterContainer/Stack/Card/Content/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ShopTab"
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_tabs")
+text = "ABILITIES"
+
+[node name="SkinsTab" type="Button" parent="CenterContainer/Stack/Card/Content/TabRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ShopTab"
+toggle_mode = true
+button_group = SubResource("ButtonGroup_tabs")
+text = "SKINS"
+
+[node name="Pages" type="Control" parent="CenterContainer/Stack/Card/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 2
+
+[node name="AbilitiesPage" type="VBoxContainer" parent="CenterContainer/Stack/Card/Content/Pages"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_constants/separation = 20
+
+[node name="DoubleJumpRow" type="PanelContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_type_variation = &"ShopRow"
 
-[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/DoubleJumpRow"]
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/DoubleJumpRow"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+[node name="Icon" type="TextureRect" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/DoubleJumpRow/HBox"]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_vertical = 4
@@ -92,7 +173,7 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+[node name="Label" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/DoubleJumpRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopNameLabel"
 text = "Double Jump"
@@ -101,30 +182,30 @@ custom_minimum_size = Vector2(260, 0)
 size_flags_horizontal = 3
 autowrap_mode = 2
 
-[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+[node name="PriceLabel" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/DoubleJumpRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopPriceLabel"
 text = "200"
 horizontal_alignment = 1
 custom_minimum_size = Vector2(80, 0)
 
-[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/DoubleJumpRow/HBox"]
+[node name="BuyButton" type="Button" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/DoubleJumpRow/HBox"]
 custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
 theme_type_variation = &"AccentButton"
 text = "BUY"
 
-[node name="GlideRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+[node name="GlideRow" type="PanelContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_type_variation = &"ShopRow"
 
-[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/GlideRow"]
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/GlideRow"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+[node name="Icon" type="TextureRect" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/GlideRow/HBox"]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_vertical = 4
@@ -133,7 +214,7 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+[node name="Label" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/GlideRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopNameLabel"
 text = "Glide"
@@ -142,30 +223,30 @@ custom_minimum_size = Vector2(260, 0)
 size_flags_horizontal = 3
 autowrap_mode = 2
 
-[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+[node name="PriceLabel" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/GlideRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopPriceLabel"
 text = "400"
 horizontal_alignment = 1
 custom_minimum_size = Vector2(80, 0)
 
-[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/GlideRow/HBox"]
+[node name="BuyButton" type="Button" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/GlideRow/HBox"]
 custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
 theme_type_variation = &"AccentButton"
 text = "BUY"
 
-[node name="FireUpgradeRow" type="PanelContainer" parent="CenterContainer/Card/Content"]
+[node name="FireUpgradeRow" type="PanelContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_type_variation = &"ShopRow"
 
-[node name="HBox" type="HBoxContainer" parent="CenterContainer/Card/Content/FireUpgradeRow"]
+[node name="HBox" type="HBoxContainer" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/FireUpgradeRow"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Icon" type="TextureRect" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+[node name="Icon" type="TextureRect" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/FireUpgradeRow/HBox"]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_vertical = 4
@@ -174,7 +255,7 @@ expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+[node name="Label" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/FireUpgradeRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopNameLabel"
 text = "Fire Cooldown Lv.2"
@@ -183,20 +264,49 @@ custom_minimum_size = Vector2(260, 0)
 size_flags_horizontal = 3
 autowrap_mode = 2
 
-[node name="PriceLabel" type="Label" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+[node name="PriceLabel" type="Label" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/FireUpgradeRow/HBox"]
 layout_mode = 2
 theme_type_variation = &"ShopPriceLabel"
 text = "300"
 horizontal_alignment = 1
 custom_minimum_size = Vector2(80, 0)
 
-[node name="BuyButton" type="Button" parent="CenterContainer/Card/Content/FireUpgradeRow/HBox"]
+[node name="BuyButton" type="Button" parent="CenterContainer/Stack/Card/Content/Pages/AbilitiesPage/FireUpgradeRow/HBox"]
 custom_minimum_size = Vector2(180, 80)
 layout_mode = 2
 theme_type_variation = &"AccentButton"
 text = "BUY"
 
-[node name="BackButton" type="Button" parent="CenterContainer/Card/Content"]
+[node name="SkinsPage" type="Control" parent="CenterContainer/Stack/Card/Content/Pages"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SkinScroll" type="ScrollContainer" parent="CenterContainer/Stack/Card/Content/Pages/SkinsPage"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+scroll_deadzone = 18
+follow_focus = true
+script = ExtResource("9_scroll")
+
+[node name="SkinList" type="VBoxContainer" parent="CenterContainer/Stack/Card/Content/Pages/SkinsPage/SkinScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="CenterContainer/Stack/Card/Content"]
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_type_variation = &"SecondaryButton"

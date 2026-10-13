@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/SkinRow.gd" id="1_row"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/dragon_idle_a.png" id="2_icon"]
+
+[node name="SkinRow" type="PanelContainer"]
+mouse_filter = 1
+theme_type_variation = &"ShopRow"
+script = ExtResource("1_row")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="HBox"]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_vertical = 4
+texture_filter = 2
+mouse_filter = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="HBox"]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_type_variation = &"ShopNameLabel"
+autowrap_mode = 2
+
+[node name="PriceLabel" type="Label" parent="HBox"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"ShopPriceLabel"
+horizontal_alignment = 1
+
+[node name="ActionButton" type="Button" parent="HBox"]
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+mouse_filter = 1
+theme_type_variation = &"AccentButton"
+theme_override_font_sizes/font_size = 36
+text = "BUY"
