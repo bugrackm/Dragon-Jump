@@ -66,3 +66,5 @@ Some assets by Kenney (www.kenney.nl), CC0 1.0 Universal
 ```
 
 Menu logo, dragon and floating-island art (assets/ui/menu/) is derived from the project's own splash key art (assets/splash/splash_source.png, Xaden's ChatGPT-generated image), same provenance as the splash. Regenerate with tools/menu_art/cut_menu_art.py.
+
+Starting ground art (assets/sprites/ground/ground_start.png) is a ChatGPT-generated image made by Xaden for this project, cropped to the slab and made fully opaque (original kept outside the repo).
