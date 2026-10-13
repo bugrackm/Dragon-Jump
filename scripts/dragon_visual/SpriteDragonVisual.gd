@@ -7,9 +7,11 @@ extends AnimatedSprite2D
 ## set_facing(dir: int) -> void: -1 left, 1 right, 0 keeps current facing.
 ## set_motion(velocity: Vector2, on_floor: bool) -> void: no-op here; reserved for rigs.
 ## freeze() -> void: stop playback using the original sprite stop semantics.
-## apply_skin(skin: Resource) -> void: null-safe no-op until skins are implemented.
+## apply_skin(skin: Resource) -> void: apply body tint, or clear the material for Classic.
 
 signal one_shot_finished(name: StringName)
+
+const SkinMaterial := preload("res://scripts/cosmetics/SkinMaterial.gd")
 
 
 func _ready() -> void:
@@ -39,8 +41,8 @@ func freeze() -> void:
 	stop()
 
 
-func apply_skin(_skin: Resource) -> void:
-	pass
+func apply_skin(skin: Resource) -> void:
+	SkinMaterial.apply_to(self, skin)
 
 
 func _on_animation_finished() -> void:

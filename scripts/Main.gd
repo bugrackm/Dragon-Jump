@@ -2,6 +2,7 @@ extends Node2D
 
 ## Routes top-level screens and composes a fresh gameplay world for each run.
 
+const SkinCatalog := preload("res://scripts/cosmetics/SkinCatalog.gd")
 const UiFx := preload("res://scripts/ui/UiFx.gd")
 const MENU_BACKDROP_SCENE := preload("res://scenes/ui/MenuBackdrop.tscn")
 const MAIN_MENU_SCENE := preload("res://scenes/MainMenu.tscn")
@@ -27,6 +28,8 @@ var _shop_screen: CanvasLayer
 var _settings_return_to_pause := false
 var _quit_requested := false
 var _suppress_quit := false ## Test hook: record quit without exiting.
+
+var _skin_override: String = "" ## Dev aid: F8 cycles the next run's skin for this session only.
 
 var _current_world: Node2D
 var _platform_manager
@@ -88,6 +91,17 @@ func _is_open(layer: CanvasLayer) -> bool:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event is InputEventKey:
+		return
+	if (
+		OS.is_debug_build() and event.keycode == KEY_F8 and event.pressed and not event.echo
+		and run_session.state == run_session.RunState.READY and _is_open(_main_menu)
+		and not _is_open(_shop_screen) and not _is_open(_settings_menu)
+	):
+		var skins: Array = SkinCatalog.get_all()
+		var index: int = skins.find(SkinCatalog.get_skin(_active_skin_id()))
+		_skin_override = skins[(index + 1) % skins.size()].id
+		print("skin_override=%s" % _skin_override)
+		get_viewport().set_input_as_handled()
 		return
 	if event.keycode != KEY_ESCAPE or not event.pressed or event.echo:
 		return
@@ -256,6 +270,7 @@ func _setup_world() -> void:
 		profile_store.is_glide_unlocked(),
 		profile_store.get_fire_breath_level()
 	)
+	_player.apply_skin(SkinCatalog.get_skin(_active_skin_id()))
 
 	_last_difficulty_factor = -1.0
 	_player.initialize_abilities(_current_world, _enemy_manager, _camera)
@@ -376,6 +391,10 @@ func _on_shop_purchase_made() -> void:
 	hud.set_coins(profile_store.total_coins)
 	if is_instance_valid(_main_menu):
 		_main_menu.call("refresh", profile_store)
+
+
+func _active_skin_id() -> String:
+	return _skin_override if not _skin_override.is_empty() else profile_store.get_equipped_skin_id()
 
 
 func _free_current_world() -> void:
