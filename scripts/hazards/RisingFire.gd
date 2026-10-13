@@ -12,12 +12,11 @@ enum SpeedModel { RUBBER_BAND, CONSTANT, SCREEN_BAND }
 ## SCREEN_BAND: how far the fire top sits above the screen bottom (world units).
 @export var visible_band := 70.0
 @export var kill_inset := 12.0
-@export var activation_margin := 40.0
 
 var fire_top_y := 2340.0
 var _camera: Camera2D
 var _player: Node2D
-var _activation_y := 0.0
+var _platform_reached := false
 var _difficulty := 0.0
 var _active := false
 var _stopped := true
@@ -34,10 +33,10 @@ func _process(delta: float) -> void:
 	_wall_material.set_shader_parameter("u_time", _visual_time)
 
 
-func setup(camera: Camera2D, player: Node2D, ground_top_y: float, jump_height: float) -> void:
+func setup(camera: Camera2D, player: Node2D, ground_top_y: float) -> void:
 	_camera = camera
 	_player = player
-	_activation_y = ground_top_y - (jump_height + activation_margin)
+	_platform_reached = false
 	fire_top_y = maxf(ground_top_y + 600.0, ScreenLayout.visible_bottom(_camera.position.y) + leash_below_screen)
 	global_position.y = fire_top_y
 	_difficulty = 0.0
@@ -46,6 +45,11 @@ func setup(camera: Camera2D, player: Node2D, ground_top_y: float, jump_height: f
 	visible = false
 	_flames.emitting = false
 	set_physics_process(true)
+
+
+## The fire waits until the player first lands on a platform (not the ground).
+func notify_platform_landing() -> void:
+	_platform_reached = true
 
 
 func set_difficulty(factor: float) -> void:
@@ -68,7 +72,7 @@ func _physics_process(delta: float) -> void:
 		return
 	var camera_bottom := ScreenLayout.visible_bottom(_camera.position.y)
 	if not _active:
-		if _player.global_position.y >= _activation_y:
+		if not _platform_reached:
 			return
 		_active = true
 		fire_top_y = camera_bottom + leash_below_screen
