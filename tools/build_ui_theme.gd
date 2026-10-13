@@ -62,6 +62,7 @@ func _initialize() -> void:
 	_panel("Badge", FIRE, 32, 4, 12)
 	_toggles()
 	_slider()
+	_shop_types()
 	_name_subresources(_theme, {})
 	DirAccess.make_dir_recursive_absolute("res://assets/ui/theme")
 	var error := ResourceSaver.save(_theme, "res://assets/ui/theme/dragon_theme.tres")
@@ -203,3 +204,17 @@ func _name_subresources(resource: Resource, visited: Dictionary) -> void:
 			var value: Variant = resource.get(property.name)
 			if value is Resource:
 				_name_subresources(value, visited)
+
+
+func _shop_types() -> void:
+	_button("ShopTab", FIRE, FIRE_DARK)
+	_theme.set_font_size("font_size", "ShopTab", 38)
+	for state in ["normal", "hover"]:
+		var box := _theme.get_stylebox(state, "ShopTab") as StyleBoxFlat
+		box.bg_color = Color.WHITE if state == "hover" else Color("f1e8d6")
+	for state in ["font_color", "font_hover_color", "font_focus_color"]:
+		_theme.set_color(state, "ShopTab", INK)
+	_theme.set_constant("outline_size", "ShopTab", 0)
+	_panel("ShopRowSelected", Color(1, 0.97, 0.86, 0.96), 24, 6, 16)
+	var selected := _theme.get_stylebox("panel", "ShopRowSelected") as StyleBoxFlat
+	selected.border_color = GOLD.lerp(FIRE, 0.35)

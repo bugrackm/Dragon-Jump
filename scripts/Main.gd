@@ -55,6 +55,7 @@ func _ready() -> void:
 	run_session.game_over.connect(_on_game_over)
 	profile_store.high_score_changed.connect(hud.set_high_score)
 	profile_store.coins_changed.connect(hud.set_coins)
+	profile_store.skin_equipped.connect(func(_id: String) -> void: _skin_override = "")
 	run_session.run_coins_changed.connect(_on_run_coins_changed)
 	hud.fire_requested.connect(_on_fire_requested)
 	hud.pause_requested.connect(_pause_game)
