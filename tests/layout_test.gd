@@ -71,11 +71,15 @@ func _check_ui() -> void:
 	viewport.add_child(hud)
 	hud.show_playing()
 	var menus: Array[CanvasLayer] = []
+	var shop_profile := ProfileStore.new()
 	for scene_name in ["MainMenu", "GameOverScreen", "PauseOverlay", "SettingsMenu", "ShopScreen"]:
 		var menu := load("res://scenes/%s.tscn" % scene_name).instantiate() as CanvasLayer
 		viewport.add_child(menu)
 		menu.visible = true
 		menus.append(menu)
+		if menu.name == "ShopScreen":
+			menu._profile_store = shop_profile
+			menu.refresh()
 	_layout.debug_insets_override = Vector4.ZERO
 	var changes := [0]
 	var on_change := func() -> void: changes[0] += 1
@@ -138,22 +142,48 @@ func _check_ui() -> void:
 					for child in row.get_children():
 						_expect(row.get_global_rect().encloses(child.get_global_rect()), "settings child inside row " + child.name)
 			if menu.name == "ShopScreen":
-				for row_name in ["DoubleJumpRow", "GlideRow", "FireUpgradeRow"]:
-					var row := content.get_node(row_name) as Control
-					_expect(content.get_global_rect().encloses(row.get_global_rect()), "shop row inside Content " + row_name)
-					for label_name in ["Label", "PriceLabel"]:
-						var label := row.get_node("HBox/" + label_name) as Label
-						_expect(label.get_theme_font_size("font_size") >= 36, "readable shop text " + row_name + label_name)
-						_expect(row.get_global_rect().encloses(label.get_global_rect()), "shop text inside row " + row_name + label_name)
-			for button in menu.find_children("*", "BaseButton"):
-				_expect(button.size.y >= 72, "menu touch target " + menu.name + "/" + button.name)
-				_expect(safe_rect.encloses(button.get_global_rect()), "safe menu button " + menu.name + "/" + button.name)
+				for skins in [false, true]:
+					menu._show_tab(skins)
+					await process_frame
+					await process_frame
+					var preview: Control = menu.get_node("%PreviewCard")
+					_expect(safe_rect.encloses(preview.get_global_rect()), "safe preview")
+					_expect(not preview.get_global_rect().intersects(menu.get_node("%Card").get_global_rect()), "separate shop cards")
+					var rows: Array = menu.skin_list.get_children() if skins else menu.abilities_page.get_children()
+					for row in rows:
+						if not skins:
+							_expect(content.get_global_rect().encloses(row.get_global_rect()), "shop row inside Content " + row.name)
+						for label_name in ["Label", "PriceLabel"]:
+							var label := row.get_node("HBox/" + label_name) as Label
+							_expect(label.get_theme_font_size("font_size") >= 36, "readable shop text " + row.name + label_name)
+							_expect(row.get_global_rect().encloses(label.get_global_rect()), "shop text inside row " + row.name + label_name)
+					_check_menu_buttons(menu, safe_rect)
+			else:
+				_check_menu_buttons(menu, safe_rect)
 	_expect(changes[0] == 8, "override changes emit once each")
 	_layout.debug_insets_override = Vector4(-10, 120, -20, 90)
 	_expect(_layout.safe_insets == Vector4(0, 120, 0, 90), "debug insets clamp nonnegative")
 	_layout.layout_changed.disconnect(on_change)
 	viewport.free()
+	shop_profile.free()
 	_layout.debug_insets_override = Vector4(-1, -1, -1, -1)
+
+
+func _check_menu_buttons(menu: CanvasLayer, safe_rect: Rect2) -> void:
+	for button in menu.find_children("*", "BaseButton", true, false):
+		if not button.is_visible_in_tree():
+			continue
+		var clipped := false
+		var ancestor: Node = button.get_parent()
+		while ancestor != null:
+			if ancestor is ScrollContainer and not ancestor.get_global_rect().encloses(button.get_global_rect()):
+				clipped = true
+				break
+			ancestor = ancestor.get_parent()
+		if clipped:
+			continue
+		_expect(button.size.y >= 72, "menu touch target " + menu.name + "/" + button.name)
+		_expect(safe_rect.encloses(button.get_global_rect()), "safe menu button " + menu.name + "/" + button.name)
 
 
 ## Distance from the screen edge: the design gap without a cutout, otherwise
