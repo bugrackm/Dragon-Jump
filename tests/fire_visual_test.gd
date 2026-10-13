@@ -27,7 +27,7 @@ func _run() -> void:
 	_expect(fire.process_mode == Node.PROCESS_MODE_PAUSABLE, "root is pausable")
 	for entry in [["speed_model", 2], ["visible_band", 70.0], ["kill_inset", 12.0],
 			["rise_speed_min", 90.0], ["rise_speed_max", 170.0],
-			["leash_below_screen", 40.0], ["activation_margin", 40.0]]:
+			["leash_below_screen", 40.0]]:
 		_expect(fire.get(entry[0]) == entry[1], "unchanged " + entry[0])
 	var material := fire.get_node("Body").material as ShaderMaterial
 	_expect(material != null and material.shader != null, "wall shader material")
@@ -57,7 +57,8 @@ func _run() -> void:
 	root.add_child(player)
 	camera.position = Vector2(540.0, 960.0)
 	player.position.y = 1000.0
-	fire.setup(camera, player, 1722.0, 400.0)
+	fire.setup(camera, player, 1722.0)
+	fire.notify_platform_landing()
 	fire._physics_process(0.0)
 	fire.set_physics_process(false)
 	var before := float(material.get_shader_parameter("u_time"))

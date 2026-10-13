@@ -243,8 +243,8 @@ func _setup_world() -> void:
 	_highest_camera_y = _camera.position.y
 	_rising_fire = _current_world.get_node("RisingFire")
 	_rising_fire.player_burned.connect(run_session.end_run)
-	var jump_height: float = _player.JUMP_VELOCITY * _player.JUMP_VELOCITY / (2.0 * _player.GRAVITY)
-	_rising_fire.setup(_camera, _player, 1722.0, jump_height)
+	_rising_fire.setup(_camera, _player, 1722.0)
+	_player.landed.connect(_on_player_landed)
 
 	_coin_manager.coin_collected.connect(_on_coin_collected)
 	_enemy_manager.enemy_destroyed.connect(_coin_manager._on_enemy_destroyed)
@@ -430,6 +430,11 @@ func _on_game_over(final_score: int) -> void:
 		run_session.run_coins,
 		final_score > previous_best
 	)
+
+
+func _on_player_landed(collider: Object) -> void:
+	if collider != _current_world.get_node("Ground"):
+		_rising_fire.notify_platform_landing()
 
 
 func _on_coin_collected() -> void:
