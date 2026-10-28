@@ -1,0 +1,199 @@
+{
+  "version": 1,
+  "skin": "classic",
+  "atlas": "atlas.png",
+  "texture_scale": 0.228515625,
+  "root": "body",
+  "parts": {
+    "wing_small": {
+      "region": [
+        4,
+        878,
+        171,
+        120
+      ],
+      "pivot": [
+        41,
+        54
+      ],
+      "parent": "body",
+      "offset": [
+        87,
+        -38
+      ],
+      "z": 0
+    },
+    "wing_big": {
+      "region": [
+        4,
+        4,
+        331,
+        256
+      ],
+      "pivot": [
+        259,
+        122
+      ],
+      "parent": "body",
+      "offset": [
+        -40,
+        -49
+      ],
+      "z": 1
+    },
+    "tail": {
+      "region": [
+        246,
+        707,
+        224,
+        122
+      ],
+      "pivot": [
+        204,
+        53
+      ],
+      "parent": "body",
+      "offset": [
+        -107,
+        51
+      ],
+      "z": 2
+    },
+    "leg_back": {
+      "region": [
+        4,
+        707,
+        116,
+        167
+      ],
+      "pivot": [
+        40,
+        18
+      ],
+      "parent": "body",
+      "offset": [
+        12,
+        67
+      ],
+      "z": 3
+    },
+    "arm_back": {
+      "region": [
+        179,
+        878,
+        108,
+        117
+      ],
+      "pivot": [
+        29,
+        14
+      ],
+      "parent": "body",
+      "offset": [
+        102,
+        -19
+      ],
+      "z": 4
+    },
+    "body": {
+      "region": [
+        4,
+        264,
+        238,
+        222
+      ],
+      "pivot": [
+        129,
+        121
+      ],
+      "parent": "",
+      "offset": [
+        0,
+        0
+      ],
+      "z": 5
+    },
+    "jaw": {
+      "region": [
+        291,
+        878,
+        127,
+        69
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "parent": "head",
+      "offset": [
+        59,
+        -25
+      ],
+      "z": 6
+    },
+    "head": {
+      "region": [
+        4,
+        490,
+        269,
+        213
+      ],
+      "pivot": [
+        89,
+        196
+      ],
+      "parent": "body",
+      "offset": [
+        47,
+        -100
+      ],
+      "z": 7
+    },
+    "leg_front": {
+      "region": [
+        277,
+        490,
+        121,
+        168
+      ],
+      "pivot": [
+        48,
+        15
+      ],
+      "parent": "body",
+      "offset": [
+        -68,
+        45
+      ],
+      "z": 8
+    },
+    "arm_front": {
+      "region": [
+        124,
+        707,
+        118,
+        125
+      ],
+      "pivot": [
+        49,
+        14
+      ],
+      "parent": "body",
+      "offset": [
+        -29,
+        -44
+      ],
+      "z": 9
+    }
+  },
+  "anchors": {
+    "mouth": [
+      216,
+      -126
+    ],
+    "feet": [
+      -42,
+      197
+    ]
+  }
+}
