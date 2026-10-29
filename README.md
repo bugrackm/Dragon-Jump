@@ -38,6 +38,7 @@ The preset is single-threaded on purpose: GitHub Pages cannot send the COOP/COEP
 
 Issues and pull requests are welcome.
 
-## Credits
+## License
 
-Third-party assets and their licenses are listed in [docs/CREDITS.md](docs/CREDITS.md).
+The code and the project's original artwork are released under the [MIT License](LICENSE).
+Third-party assets (Kenney packs, fonts, music) keep their own licenses, listed in [docs/CREDITS.md](docs/CREDITS.md).
