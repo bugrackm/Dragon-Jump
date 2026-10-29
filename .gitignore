@@ -30,7 +30,6 @@ Thumbs.db
 *.idsig
 *.aab
 *.keystore
-!debug.keystore
 
 # Python
 __pycache__/
@@ -40,3 +39,6 @@ __pycache__/
 
 # Godot UID files (editor-generated, non-functional)
 *.uid
+
+# Web export output (published to the gh-pages branch)
+build/
